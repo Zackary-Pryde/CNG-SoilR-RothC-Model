@@ -66,14 +66,29 @@ fw1func<-function(P, E, S.Thick = 30, pClay = 32.0213, pE = 1, bare) {
   return(data.frame(Acc.TSMD, b, Max.TSMD))
 }
 
-fW_2<- fw1func(P=(Precip[,2]), E=(Evp[,2]), S.Thick = soil.thick, pClay = clay, pE = 1, bare=bc$Soil_Cover)$b 
+fW_2<- fw1func(P=(Precip[,2]), E=(Evp[,2]), S.Thick = soil.thick, pClay = clay, pE = 1, bare=bc$Soil_Cover)$b
 
 #Vegetation Cover effects 
+Cov2 = bc
+
+
 fC <- Cov2[,2]
+fC[which(fC == TRUE)] = 1 
+fC[which(fC == 0)] = 0.6 
+fC
+
+fPR = 1.56 #Guessing for now... Dont know what this param is
 
 # Set the factors frame for Model calculations
 xi.frame=data.frame(years,rep(fT*fW_2*fC*fPR,length.out=length(years)))
 
+DR = 1.44 # Havent defined this yet
+
+DPMptf = 0.6396 
+RPMptf = 13.2247
+BIOptf = 1.8943 
+HUMptf = 72.5269 
+FallIOM = 9.0260
 
 # RUN THE MODEL from soilassessment
 #Roth C soilassesment
@@ -88,7 +103,7 @@ Ct3_spin=Model3_spin[,2:6]
 poolSize3_spin=as.numeric(tail(Ct3_spin,1))
 
 poolSize3_spin
-
+SOC_BL = sum(poolSize3_spin)
 
 
 
