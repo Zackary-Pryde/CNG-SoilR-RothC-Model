@@ -31,7 +31,6 @@ Temp = data.frame("Month" = 1:12,
 Precip = data.frame("Month" = 1:12, 
                     "Precip" = c(25.83, 27.65, 44.31, 27.65, 11.77, 7.9, 13.69, 16.54, 13.69, 21.23, 29.46, 25.83)) # NOTE that these values are excluding any irrigation
 
-<<<<<<< HEAD
 # Evp = data.frame("Month" = 1:12, 
 #                 "Evp" = c(265.1, 223.1, 191.4, 142.8, 112.9, 89.29, 97.17, 125.9, 158.6, 200.3, 248.6, 274.9))
 
@@ -40,13 +39,12 @@ Precip = data.frame("Month" = 1:12,
  
 # Evp=data.frame(Month=1:12, Evp=c(12, 18, 35, 58, 82, 90, 97, 84, 54, 31,
 #                                 14, 10))
-=======
+
 Evp = data.frame("Month" = 1:12,
                  "Evp" = c(265.1, 223.1, 191.4, 142.8, 112.9, 89.29, 97.17, 125.9, 158.6, 200.3, 248.6, 274.9))
 
 # Evp=data.frame(Month=1:12, Evp=c(12, 18, 35, 58, 82, 90, 97, 84, 54, 31,
 #                                  14, 10))
->>>>>>> 108d16104d9768d8361b233583ece7b75b04b52c
 
 # 3. Edaphic Data ----
 
