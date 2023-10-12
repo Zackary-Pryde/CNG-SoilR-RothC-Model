@@ -21,6 +21,8 @@ p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula)
 #   Stratum = Knysna-Amatole montane forests / Cfb : Temperate, no dry season, warm summer
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
+# Defining the input variables
+
 Temp = data.frame("Month" = 1:12, 
                   "Temp" = c(24.75, 24.75, 22.8, 19.7, 15.55, 12.75, 12.2, 14.45, 16.95, 19.15, 21.35, 23.3))
 
@@ -30,15 +32,28 @@ Precip = data.frame("Month" = 1:12,
 Evp=data.frame(Month=1:12, Evp=c(12, 18, 35, 58, 82, 90, 97, 84, 54, 31,14, 10))
 
 bc = data.frame("Month" = 1:12,
-                "Soil_Cover" = c(TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE))
+                "Bare" = c(FALSE,FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE))
+
+Cov2 = bc %>%
+  mutate(Soil_Cover = ifelse(Soil_Cover == TRUE, 1,0.6))
 
 soil.thick = 30 # Soil thickness (organic layer topsoil) (cm)
 SOC = 97.4651688163155 # Soil Organic Carbon Stock (Mg/ha). NB: Mg refers to Megagram = metric Tonne.
 clay = 21.4800892252279 # Percent clay (%)
 Cinputs = 0.5 # Annual C inputs to soil (Mg/ha/yr). NB: This is the value that we need to check on. For now, Ill assume its the same as that used to calibrate
 
-years = seq(1/12,500,by=1/12) 
+fPR = 1 # Related to the land use/cover category... 
 
+DR = 1.44 # Havent defined this yet
+
+# Initial conditions from spin up
+DPMptf = 0.6396 
+RPMptf = 13.2247
+BIOptf = 1.8943 
+HUMptf = 72.5269 
+FallIOM = 9.0260
+
+years = seq(1/12,500,by=1/12) 
 
 # ROTH C MODEL FUNCTION .
 
@@ -69,32 +84,14 @@ fw1func<-function(P, E, S.Thick = 30, pClay = 32.0213, pE = 1, bare) {
 fW_2<- fw1func(P=(Precip[,2]), E=(Evp[,2]), S.Thick = soil.thick, pClay = clay, pE = 1, bare=bc$Soil_Cover)$b
 
 #Vegetation Cover effects 
-Cov2 = bc %>%
-  mutate(Soil_Cover = ifelse(Soil_Cover == TRUE, 1,0.6))
-
 fC <- Cov2[,2]
-
-fPR = 1.56 #Guessing for now... Dont know what this param is
 
 # Set the factors frame for Model calculations
 xi.frame=data.frame(years,rep(fT*fW_2*fC*fPR,length.out=length(years)))
 
-DR = 1.44 # Havent defined this yet
-
-DPMptf = 0.6396 
-RPMptf = 13.2247
-BIOptf = 1.8943 
-HUMptf = 72.5269 
-FallIOM = 9.0260
-
-# RUN THE MODEL from soilassessment
-#Roth C soilassesment
-Model3_spin=carbonTurnover(tt=years,C0=c(DPMptf, RPMptf, BIOptf, HUMptf, FallIOM),In=Cinputs,Dr=DR,clay=clay,effcts=xi.frame, "euler") 
-Ct3_spin=Model3_spin[,2:6]
-
 # RUN THE MODEL FROM SOILR
-#Model3_spin=RothCModel(t=years,C0=c(DPMptf, RPMptf, BIOptf, HUMptf, FallIOM),In=Cinputs,DR=DR,clay=clay,xi=xi.frame, pass=TRUE) 
-#Ct3_spin=getC(Model3_spin)
+Model3_spin=RothCModel(t=years,C0=c(DPMptf, RPMptf, BIOptf, HUMptf, FallIOM),In=Cinputs,DR=DR,clay=clay,xi=xi.frame, pass=TRUE) 
+Ct3_spin=getC(Model3_spin)
 
 # Get the final pools of the time series
 poolSize3_spin=as.numeric(tail(Ct3_spin,1))
