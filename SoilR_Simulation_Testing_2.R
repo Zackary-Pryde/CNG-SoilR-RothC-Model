@@ -69,13 +69,10 @@ fw1func<-function(P, E, S.Thick = 30, pClay = 32.0213, pE = 1, bare) {
 fW_2<- fw1func(P=(Precip[,2]), E=(Evp[,2]), S.Thick = soil.thick, pClay = clay, pE = 1, bare=bc$Soil_Cover)$b
 
 #Vegetation Cover effects 
-Cov2 = bc
-
+Cov2 = bc %>%
+  mutate(Soil_Cover = ifelse(Soil_Cover == TRUE, 1,0.6))
 
 fC <- Cov2[,2]
-fC[which(fC == TRUE)] = 1 
-fC[which(fC == 0)] = 0.6 
-fC
 
 fPR = 1.56 #Guessing for now... Dont know what this param is
 
