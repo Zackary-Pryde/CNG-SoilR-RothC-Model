@@ -89,8 +89,9 @@ Evp = data.frame("Month" = 1:12,
 
 # Edaphic Data
 
-soil.thick = 30
-clay = 21.48
+Soil_Depth = 30
+Clay_Stratum = 21.48
+SOC_Stratum = 97.4651688163155
 
 # RothC Simulation Duration
 
@@ -103,12 +104,25 @@ bc = data.frame("Month" = 1:12,
 
 # Other SOC related calibration inputs
 
-SOC_Stratum = 97.4651688163155
-FallIOM=0.049*SOC_Stratum^(1.139)
-
-DPMptf = 0
-RPMptf = 0
-BIOptf = 0
-HUMptf = 0
+DPMi = 0
+RPMi = 0
+BIOi = 0
+HUMi = 0
+IOM = 0.049*SOC_Stratum^(1.139)
 
 DPM_to_RPM_Ratio = 1.44
+Cinputs_Initial = 0.5
+
+Roth_C(Cinputs = Cinputs_Initial, 
+       years = years, 
+       DPMptf = DPMi,
+       RPMptf = RPMi,
+       BIOptf = BIOi,
+       HUMptf = HUMi, 
+       FallIOM = IOM, 
+       Temp = Temp, Precip = Precip, Evp = Evp, 
+       soil.thick = Soil_Depth, 
+       SOC = SOC_Stratum, 
+       clay = Clay_Stratum, 
+       DR = DPM_to_RPM_Ratio, 
+       bare1 = bc)
