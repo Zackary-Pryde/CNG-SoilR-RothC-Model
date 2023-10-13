@@ -28,14 +28,16 @@ p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula)
 
 # 2. Defining the RothC function ----
 
-# ROTH C MODEL FUNCTION .
 Roth_C<-function(Cinputs,years,
                  DPMptf, RPMptf, BIOptf, HUMptf, FallIOM,
-                 Temp,Precip,Evp,Cov2,soil.thick,SOC,clay,DR,bare1){
-  #Temperature factor per month
-  fT=fT.RothC(Temp[,2])
+                 Temp,Precip,Evp,soil.thick,SOC,clay,DR,bare1){
   
-  #Moisture effects per month . 
+  fT.RothC_CNG = function (Temp_input) {
+    47.91/(1 + exp(106.06/(ifelse(Temp_input >= -18.27, Temp_input, NA) + 18.27)))
+  }
+  
+  fT = fT.RothC_CNG(Temp[,2])
+  
   fw1func<-function(P, E, S.Thick = 30, pClay = 32.0213, pE = 1, bare) {
     M = P - E * pE
     Acc.TSMD = NULL
@@ -56,19 +58,57 @@ Roth_C<-function(Cinputs,years,
     return(data.frame(Acc.TSMD, b, Max.TSMD))
   }
   
-  fW_2<- fw1func(P=(Precip[,2]), E=(Evp[,2]), S.Thick = soil.thick, pClay = clay, pE = 1, bare=bare1$Soil_Cover)$b
+  fW_2<- fw1func(P=(Precip[,2]), E=(Evp[,2]), S.Thick = soil.thick, pClay = clay, pE = 1, bare=bare1$Bare)$b
   
-  #Vegetation Cover effects 
+  Cov2 = bc %>%
+    mutate(Soil_Cover = ifelse(Bare == TRUE, 1,0.6))
+  
   fC <- Cov2[,2]
   
-  # Set the factors frame for Model calculations
   xi.frame=data.frame(years,rep(fT*fW_2*fC*fPR,length.out=length(years)))
   
-  # RUN THE MODEL FROM SOILR
   Model3_spin=RothCModel(t=years,C0=c(DPMptf, RPMptf, BIOptf, HUMptf, FallIOM),In=Cinputs,DR=DR,clay=clay,xi=xi.frame, pass=TRUE) 
   Ct3_spin=getC(Model3_spin)
   
-  # Get the final pools of the time series
   poolSize3_spin=as.numeric(tail(Ct3_spin,1))
   return(poolSize3_spin)
 }
+
+# 3. Defining Calibration Input Conditions ----
+
+# Climate Data
+
+Temp = data.frame("Month" = 1:12, 
+                  "Temp" = c(24.8, 24.8, 22.8, 19.7, 15.6, 12.8, 12.2, 14.4, 16.9, 19.1, 21.4, 23.3))
+
+Precip = data.frame("Month" = 1:12, 
+                    "Precip" = c(25.8, 27.6, 44.3, 27.6, 11.8, 7.9, 13.7, 16.5, 13.7, 21.2, 29.5, 25.8))
+
+Evp = data.frame("Month" = 1:12, 
+                 "Evp" = c(265.1, 223.1, 191.4, 142.8, 112.9, 89.3, 97.2, 125.9, 158.6, 200.3, 248.6, 274.9))
+
+# Edaphic Data
+
+soil.thick = 30
+clay = 21.48
+
+# RothC Simulation Duration
+
+years = seq(1/12,1000,by=1/12)
+
+# Bare/Cover Data
+
+bc = data.frame("Month" = 1:12,
+                "Bare" = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
+
+# Other SOC related calibration inputs
+
+SOC_Stratum = 97.4651688163155
+FallIOM=0.049*SOC_Stratum^(1.139)
+
+DPMptf = 0
+RPMptf = 0
+BIOptf = 0
+HUMptf = 0
+
+DPM_to_RPM_Ratio = 1.44
