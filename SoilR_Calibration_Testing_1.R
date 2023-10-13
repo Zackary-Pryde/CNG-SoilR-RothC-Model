@@ -112,14 +112,14 @@ bc = data.frame("Month" = 1:12,
 
 # Other SOC related calibration inputs
 
-DPMi = 1
-RPMi = 1
-BIOi = 1
-HUMi = 1
+DPMi = 0
+RPMi = 0
+BIOi = 0
+HUMi = 0
 IOM = 0.049*SOC_Stratum^(1.139)
 
 DPM_to_RPM_Ratio = 1.44
-Cinputs_Initial = 0.5
+Cinputs_Initial = 1
 
 Roth_C(Cinputs = Cinputs_Initial, 
        years = years, 
@@ -135,4 +135,8 @@ Roth_C(Cinputs = Cinputs_Initial,
        DR = DPM_to_RPM_Ratio, 
        bare1 = bc)
 
-RothCModel()
+
+fb<-Roth_C(Cinputs=0,years=years,DPMptf=0, RPMptf=0, BIOptf=0, HUMptf=0, FallIOM=IOM,Temp=Temp,Precip=Precip,Evp=Evp,soil.thick=Soil_Depth,SOC=SOC_Stratum,clay=Clay_Stratum,DR=DPM_to_RPM_Ratio,bare1=bc)
+fb_t<-fb[1]+fb[2]+fb[3]+fb[4]+fb[5]
+m<-(fb_t-FallIOM)/(Cinputs_Initial)
+Ceq<-(SOC_Stratum-FallIOM)/m
