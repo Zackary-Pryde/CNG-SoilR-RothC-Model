@@ -100,5 +100,5 @@ FallIOM = 9.0260
 
 years = seq(1/12,3,by=1/12) 
 
-SOC_BL = 
+#SOC_BL = 
 

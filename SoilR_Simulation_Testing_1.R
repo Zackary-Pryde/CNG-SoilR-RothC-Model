@@ -96,25 +96,3 @@ poolSize1=as.numeric(tail(Ct1,1))
 names(poolSize1)<-c("DPM", "RPM", "BIO", "HUM", "IOM")
 poolSize1
 sum(poolSize1)
-
-if (abs(sum(poolSize1) - SOC)/SOC > 0.05) {
-  print("SOC stocks NOT CORRECTLY Calibrated, Changing Cinputs")
-  Cinputs = Cinputs + 0.05
-} else {print("Calibration Complete")}
-
-
-Cinputs = 1
-Perc_Diff = 1
-
-while (Perc_Diff > 0.01) {
-  Model1=RothCModel(t = years,
-                    C0=c(DPM = 0, RPM = 0, BIO = 0, HUM = 0, IOM = FallIOM),
-                    In = Cinputs, 
-                    clay = clay, 
-                    xi = xi.frame, pass = TRUE, solver = deSolve.lsoda.wrapper) # Loads the model
-  Ct1 = getC(Model1) # Calculates stocks for each pool per month
-  poolSize1=as.numeric(tail(Ct1,1))
-  SOC_Cali = sum(poolSize1)
-  Perc_Diff = (SOC - SOC_Cali)/SOC
-  print(paste0("Difference = ",SOC - SOC_Cali))
-  Cinputs = Cinputs + Perc_Diff*Cinputs}

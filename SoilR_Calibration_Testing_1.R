@@ -26,61 +26,61 @@
 library(pacman)
 p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula, tidyverse)
 
-# 2. Defining the RothC function ----
+Temp = data.frame("Month" = 1:12, 
+                  "Temp" = c(24.75, 24.75, 22.8, 19.7, 15.55, 12.75, 12.2, 14.45, 16.95, 19.15, 21.35, 23.3))
 
-Roth_C<-function(Cinputs,years,
-                 DPMptf, RPMptf, BIOptf, HUMptf, FallIOM,
-                 Temp,Precip,Evp,soil.thick,SOC,clay,DR,bare1){
+Precip = data.frame("Month" = 1:12, 
+                    "Precip" = c(25.83, 27.65, 44.31, 27.65, 11.77, 7.9, 13.69, 16.54, 13.69, 21.23, 29.46, 25.83)) # NOTE that these values are excluding any irrigation
+
+Evp=data.frame(Month=1:12, Evp=c(12, 18, 35, 58, 82, 90, 97, 84, 54, 31,
+                                 14, 10))
+
+soil.thick = 30 # Soil thickness (organic layer topsoil) (cm)
+SOC = 97.4651 # Soil Organic Carbon Stock (Mg/ha). NB: Mg refers to Megagram = metric Tonne.
+clay = 21.4800 # Percent clay (%)
+Cinputs = 0.5 # Annual C inputs to soil (Mg/ha/yr). NB: This is the value that we need to check on. For now, Ill assume its the same as that used to calibrate
+
+years = seq(1/12,1000,by=1/12) 
+
+fT = fT.RothC(Temp[,2]) # Temperature effects per month
+
+fW = fW.RothC(P=(Precip[,2]), E=(Evp[,2]), 
+              S.Thick = soil.thick, 
+              pClay = clay, 
+              pE = 1, bare = FALSE)$b # Moisture effects per month
+
+xi.frame = data.frame(years,
+                      rep(fT*fW, length.out = length(years)))
+
+FallIOM=0.049*SOC^(1.139) #IOM using Falloon method
+
+
+# 2. Defining the RothC CALIBRATION function ----
+
+
+Cinputs = 1
+Perc_Diff = 1
+
+while (Perc_Diff > 0.01) {
   
-  fT.RothC_CNG = function (Temp_input) {
-    47.91/(1 + exp(106.06/(ifelse(Temp_input >= -18.27, Temp_input, NA) + 18.27)))
-  }
+  Model1=RothCModel(t = years,
+                    C0=c(DPM = 0, RPM = 0, BIO = 0, HUM = 0, IOM = FallIOM),
+                    In = Cinputs, 
+                    clay = clay, 
+                    xi = xi.frame, pass = TRUE, solver = deSolve.lsoda.wrapper) # Loads the model
   
-  fT = fT.RothC_CNG(Temp[,2])
+  Ct1 = getC(Model1) # Calculates stocks for each pool per month
   
-  fw1func<-function(P, E, S.Thick = 30, pClay = 32.0213, pE = 1, bare) {
-    M = P - E * pE
-    Acc.TSMD = NULL
-    for (i in 2:length(M)) {
-      B = ifelse(bare[i] == FALSE, 1, 1.8)
-      Max.TSMD = -(20 + 1.3 * pClay - 0.01 * (pClay^2)) * (S.Thick/23) * (1/B)
-      Acc.TSMD[1] = ifelse(M[1] > 0, 0, M[1])
-      if (Acc.TSMD[i - 1] + M[i] < 0) {
-        Acc.TSMD[i] = Acc.TSMD[i - 1] + M[i]
-      } else 
-        (Acc.TSMD[i] = 0)
-      if (Acc.TSMD[i] <= Max.TSMD) {
-        Acc.TSMD[i] = Max.TSMD
-      }
-    }
-    b = ifelse(Acc.TSMD > 0.444 * Max.TSMD, 1, (0.2 + 0.8 * ((Max.TSMD - Acc.TSMD)/(Max.TSMD - 0.444 * Max.TSMD))))
-    b<-clamp(b,lower=0.2)
-    return(data.frame(Acc.TSMD, b, Max.TSMD))
-  }
+  poolSize1=as.numeric(tail(Ct1,1))
   
-  fW_2<- fw1func(P=(Precip[,2]), E=(Evp[,2]), S.Thick = soil.thick, pClay = clay, pE = 1, bare=bare1$Bare)$b
+  SOC_Cali = sum(poolSize1)
   
-  Cov2 = bc %>%
-    mutate(Soil_Cover = ifelse(Bare == TRUE, 1,0.6))
+  Perc_Diff = (SOC - SOC_Cali)/SOC
   
-  fC <- Cov2[,2]
+  print(paste0("Difference = ",SOC - SOC_Cali," (",round(Perc_Diff*100, 2)," %)"))
   
-  xi.frame=data.frame(years,rep(fT*fW_2*fC,length.out=length(years)))
-  
-  Model3_spin=RothCModel(t=years,
-                         C0=c(DPMptf, RPMptf, BIOptf, HUMptf, FallIOM),
-                         ks = c(k.DPM = 10, k.RPM = 0.3, k.BIO = 0.66, k.HUM = 0.02, k.IOM = 0),
-                         In=Cinputs,
-                         DR=DR,
-                         clay=clay,
-                         xi=xi.frame, 
-                         pass=TRUE, 
-                         solver = euler) 
-  Ct3_spin=getC(Model3_spin)
-  
-  poolSize3_spin=as.numeric(tail(Ct3_spin,1))
-  return(poolSize3_spin)
-}
+  Cinputs = Cinputs + Perc_Diff*Cinputs}
+
 
 # 3. Defining Calibration Input Conditions ----
 
@@ -134,9 +134,3 @@ Roth_C(Cinputs = Cinputs_Initial,
        clay = Clay_Stratum, 
        DR = DPM_to_RPM_Ratio, 
        bare1 = bc)
-
-
-fb<-Roth_C(Cinputs=0,years=years,DPMptf=0, RPMptf=0, BIOptf=0, HUMptf=0, FallIOM=IOM,Temp=Temp,Precip=Precip,Evp=Evp,soil.thick=Soil_Depth,SOC=SOC_Stratum,clay=Clay_Stratum,DR=DPM_to_RPM_Ratio,bare1=bc)
-fb_t<-fb[1]+fb[2]+fb[3]+fb[4]+fb[5]
-m<-(fb_t-FallIOM)/(Cinputs_Initial)
-Ceq<-(SOC_Stratum-FallIOM)/m
