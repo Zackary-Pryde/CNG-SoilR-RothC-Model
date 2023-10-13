@@ -24,7 +24,7 @@
 # 1. Required Packages/Dependencies ----
 
 library(pacman)
-p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula)
+p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula, tidyverse)
 
 # 2. Defining the RothC function ----
 
@@ -65,9 +65,17 @@ Roth_C<-function(Cinputs,years,
   
   fC <- Cov2[,2]
   
-  xi.frame=data.frame(years,rep(fT*fW_2*fC*fPR,length.out=length(years)))
+  xi.frame=data.frame(years,rep(fT*fW_2*fC,length.out=length(years)))
   
-  Model3_spin=RothCModel(t=years,C0=c(DPMptf, RPMptf, BIOptf, HUMptf, FallIOM),In=Cinputs,DR=DR,clay=clay,xi=xi.frame, pass=TRUE) 
+  Model3_spin=RothCModel(t=years,
+                         C0=c(DPMptf, RPMptf, BIOptf, HUMptf, FallIOM),
+                         ks = c(k.DPM = 10, k.RPM = 0.3, k.BIO = 0.66, k.HUM = 0.02, k.IOM = 0),
+                         In=Cinputs,
+                         DR=DR,
+                         clay=clay,
+                         xi=xi.frame, 
+                         pass=TRUE, 
+                         solver = euler) 
   Ct3_spin=getC(Model3_spin)
   
   poolSize3_spin=as.numeric(tail(Ct3_spin,1))
@@ -104,10 +112,10 @@ bc = data.frame("Month" = 1:12,
 
 # Other SOC related calibration inputs
 
-DPMi = 0
-RPMi = 0
-BIOi = 0
-HUMi = 0
+DPMi = 1
+RPMi = 1
+BIOi = 1
+HUMi = 1
 IOM = 0.049*SOC_Stratum^(1.139)
 
 DPM_to_RPM_Ratio = 1.44
@@ -126,3 +134,5 @@ Roth_C(Cinputs = Cinputs_Initial,
        clay = Clay_Stratum, 
        DR = DPM_to_RPM_Ratio, 
        bare1 = bc)
+
+RothCModel()
