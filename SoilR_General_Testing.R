@@ -57,13 +57,13 @@ Get_Delta_SOC_RothC = function(Years, Weather_File, Edaphic_File, ALMP_File_BL, 
                                     calibrated_model[4,2], 
                                     calibrated_model[5,2]),
                              ks = c(k.DPM = 10, k.RPM = 0.3, k.BIO = 0.66, k.HUM = 0.02, k.IOM = 0),
-                             In = ALMP_file$Cinput[1],
-                             FYM = ALMP_file$FYM[1],
+                             In = sum(ALMP_file$Cinput),
+                             FYM = sum(ALMP_file$FYM),
                              DR = 1.44,
                              clay = edaphic_file$ClayPerc_Stratum,
                              xi = xi.frame, 
                              pass = TRUE, 
-                             solver = deSolve.lsoda.wrapper)
+                             solver = euler)
     
     Ct3_spin=getC(Model3_spin)
     colnames(Ct3_spin)<-c("DPM", "RPM", "BIO", "HUM", "IOM")
@@ -124,11 +124,9 @@ Delta_Test = Get_Delta_SOC_RothC(Years = years_input,
 
 Delta_Test$Month = 1:24
 
-gg <- ggplot(data = Delta_Test, aes(x = Month)) + theme_minimal() + 
+ggplot(data = Delta_Test, aes(x = Month)) + theme_minimal() + 
   geom_line(aes(y = SOC_Stock_BL), color = "darkblue", linetype = "dashed") + 
-  geom_point(aes(y = SOC_Stock_BL), color = "blue") + 
   geom_line(aes(y = SOC_Stock_PR), color = "darkred", linetype = "dashed") +
-  geom_point(aes(y = SOC_Stock_PR), color = "red") + 
   labs(x = "Month",
        y = "SOC (t/Ha)",
        title = "Storms River Over Two Project Years")
