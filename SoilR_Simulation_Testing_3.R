@@ -129,7 +129,7 @@ ALMP_PR = data.frame("Month" = 1:12,
                      "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
 
 calibrated_model = data.frame("Soil_Carbon_Pool" = c("DPMptf", "RPMptf", "BIOptf", "HUMptf", "FallIOM"),
-                              "Value" = c(0.4381499, 13.8652529, 1.9964292, 71.2632778, 9.0259982))
+                              "Value" = c(0.4510887, 13.3954103, 1.9193236, 72.2360421, 9.0259982))
 
 years_input = seq(1/12,2,by=1/12) 
 

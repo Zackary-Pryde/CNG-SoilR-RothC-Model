@@ -1,7 +1,7 @@
 # Required Packages/Dependencies
 
 library(pacman)
-p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula)
+p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula, ggplot2)
 
 # GET DELTA SOC VIA ROTH C (Function)
 
@@ -111,7 +111,7 @@ ALMP_PR = data.frame("Month" = 1:12,
                      "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
 
 calibrated_model_Input = data.frame("Soil_Carbon_Pool" = c("DPMptf", "RPMptf", "BIOptf", "HUMptf", "FallIOM"),
-                              "Value" = c(0.4381499, 13.8652529, 1.9964292, 71.2632778, 9.0259982))
+                              "Value" = c(0.4510887, 13.3954103, 1.9193236, 72.2360421, 9.0259982))
 
 years_input = seq(1/12,2,by=1/12) 
 
@@ -122,64 +122,13 @@ Delta_Test = Get_Delta_SOC_RothC(Years = years_input,
                                  ALMP_File_PR = ALMP_PR, 
                                  Calibrated_Model = calibrated_model_Input)
 
+Delta_Test$Month = 1:24
 
-# Old Code - - - - - -
-
-# - - - - - - - - - - -
-
-fT.RothC_CNG = function (Temp) {
-  47.91/(1 + exp(106.06/(ifelse(Temp >= -18.27, Temp, NA) + 18.27)))
-}
-
-fT = fT.RothC_CNG(JANSENVILLE_Weather_File[,2]) # Temperature effects per month
-
-fw1func<-function(P, E, S.Thick, pClay, pE = 1, bare) {
-  M = P - E * pE
-  Acc.TSMD = NULL
-  for (i in 2:length(M)) {
-    B = ifelse(bare[i] == FALSE, 1, 1.8)
-    Max.TSMD = -(20 + 1.3 * pClay - 0.01 * (pClay^2)) * (S.Thick/23) * (1/B)
-    Acc.TSMD[1] = ifelse(M[1] > 0, 0, M[1])
-    if (Acc.TSMD[i - 1] + M[i] < 0) {
-      Acc.TSMD[i] = Acc.TSMD[i - 1] + M[i]
-    } else 
-      (Acc.TSMD[i] = 0)
-    if (Acc.TSMD[i] <= Max.TSMD) {
-      Acc.TSMD[i] = Max.TSMD
-    }
-  }
-  b = ifelse(Acc.TSMD > 0.444 * Max.TSMD, 1, (0.2 + 0.8 * ((Max.TSMD - Acc.TSMD)/(Max.TSMD - 0.444 * Max.TSMD))))
-  b<-clamp(b,lower=0.2)
-  return(data.frame(Acc.TSMD, b, Max.TSMD))
-}
-
-fW_2<- fw1func(P=(JANSENVILLE_Weather_File[,3]), E=(JANSENVILLE_Weather_File[,4]), S.Thick = STRATUM_Edaphic_File$Soil_Depth, pClay = STRATUM_Edaphic_File$ClayPerc_Stratum, pE = 1, bare=ALMP_BL$Bare)$b
-
-Cov2 = ALMP_BL[,c("Month","Bare")] %>%
-  mutate(Bare = ifelse(Bare == TRUE, 1,0.6))
-
-fC <- Cov2[,2]
-
-# Set the factors frame for Model calculations
-xi.frame=data.frame(years,rep(fT*fW_2*fC,length.out=length(years)))
-
-# RUN THE MODEL FROM SOILR
-Model3_spin = RothCModel(t = years,
-                         C0 = c(calibrated_model[1,2], 
-                                calibrated_model[2,2], 
-                                calibrated_model[3,2], 
-                                calibrated_model[4,2], 
-                                calibrated_model[5,2]),
-                         ks = c(k.DPM = 10, k.RPM = 0.3, k.BIO = 0.66, k.HUM = 0.02, k.IOM = 0),
-                         In = ALMP_BL$Cinput[1],
-                         FYM = ALMP_BL$FYM[1],
-                         DR = 1.44,
-                         clay = STRATUM_Edaphic_File$ClayPerc_Stratum,
-                         xi = xi.frame, 
-                         pass = TRUE, 
-                         solver = deSolve.lsoda.wrapper)
-
-Ct3_spin=getC(Model3_spin)
-colnames(Ct3_spin)<-c("DPM", "RPM", "BIO", "HUM", "IOM")
-Model_Result = as.data.frame(Ct3_spin)
-Model_Result$SOC_Stock = Model_Result$DPM + Model_Result$RPM + Model_Result$BIO + Model_Result$HUM + Model_Result$IOM
+gg <- ggplot(data = Delta_Test, aes(x = Month)) + theme_minimal() + 
+  geom_line(aes(y = SOC_Stock_BL), color = "darkblue", linetype = "dashed") + 
+  geom_point(aes(y = SOC_Stock_BL), color = "blue") + 
+  geom_line(aes(y = SOC_Stock_PR), color = "darkred", linetype = "dashed") +
+  geom_point(aes(y = SOC_Stock_PR), color = "red") + 
+  labs(x = "Month",
+       y = "SOC (t/Ha)",
+       title = "Storms River Over Two Project Years")
