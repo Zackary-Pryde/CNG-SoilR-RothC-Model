@@ -43,7 +43,11 @@ RothC_Calibration_CNG = function(Weather_File,Edaphic_File) {
   
   years = seq(1/12,1000,by=1/12) 
   
-  fT = fT.RothC(Weather_File[,2]) # Temperature effects per month
+  fT.RothC_CNG = function (Temp) {
+    47.91/(1 + exp(106.06/(ifelse(Temp >= -18.27, Temp, NA) + 18.27)))
+  }
+  
+  fT = fT.RothC_CNG(Weather_File[,2]) # Temperature effects per month
   
   fW = fW.RothC(P=(Weather_File[,3]), E=(Weather_File[,4]), 
                 S.Thick = Edaphic_File$Soil_Depth, 

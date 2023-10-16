@@ -24,9 +24,13 @@ p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula)
 # ROTH C MODEL FUNCTION .
 Roth_C<-function(Cinputs,years,
                  DPMptf, RPMptf, BIOptf, HUMptf, FallIOM,
-                 Temp,Precip,Evp,soil.thick,SOC,clay,DR,bare1){
+                 Temp,Precip,Evp,soil.thick,clay,DR,bare1){
   
-  fT=fT.RothC(Temp[,2])
+  fT.RothC_CNG = function (Temp) {
+    47.91/(1 + exp(106.06/(ifelse(Temp >= -18.27, Temp, NA) + 18.27)))
+  }
+  
+  fT = fT.RothC_CNG(Weather_File[,2]) # Temperature effects per month
   
   fw1func<-function(P, E, S.Thick = 30, pClay = 32.0213, pE = 1, bare) {
     M = P - E * pE
@@ -69,23 +73,26 @@ Roth_C<-function(Cinputs,years,
 
 # Defining the input variables BASELINE ----
 
-Temp = data.frame("Month" = 1:12, 
-                  "Temp" = c(24.75, 24.75, 22.8, 19.7, 15.55, 12.75, 12.2, 14.45, 16.95, 19.15, 21.35, 23.3))
+JANSENVILLE_Weather_File = data.frame("Month" = 1:12,
+                                      "Temp" = c(24.75, 24.75, 22.8, 19.7, 15.55, 12.75, 12.2, 14.45, 16.95, 19.15, 21.35, 23.3),
+                                      "Precip" = c(25.83, 27.65, 44.31, 27.65, 11.77, 7.9, 13.69, 16.54, 13.69, 21.23, 29.46, 25.83),
+                                      "Evp" = c(12, 18, 35, 58, 82, 90, 97, 84, 54, 31, 14, 10))
 
-Precip = data.frame("Month" = 1:12, 
-                    "Precip" = c(25.83, 27.65, 44.31, 27.65, 11.77, 7.9, 13.69, 16.54, 13.69, 21.23, 29.46, 25.83)) # NOTE that these values are excluding any irrigation
+STRATUM_Edaphic_File = data.frame("Soil_Depth" = 30,
+                                  "SOC_Stratum" = 97.4651,
+                                  "ClayPerc_Stratum" = 21.4800)
 
-Evp=data.frame(Month=1:12, Evp=c(12, 18, 35, 58, 82, 90, 97, 84, 54, 31,14, 10))
+ALMP_BL = data.frame("Month" = 1:12,
+                     "Bare" = c(FALSE,FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
+                     "Cinput" = rep(1.18131300047788, 12),
+                     "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0),
+                     "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
 
-bc = data.frame("Month" = 1:12,
-                "Bare" = c(FALSE,FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE))
-
-
-soil.thick = 30 # Soil thickness (organic layer topsoil) (cm)
-clay = 21.4800 # Percent clay (%)
-#Cinputs = 
-
-DR = 1.44 # Havent defined this yet
+ALMP_PR = data.frame("Month" = 1:12,
+                     "Bare" = c(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
+                     "Cinput" = rep(1.56466235908391, 12),
+                     "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0),
+                     "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
 
 # Initial conditions from spin up
 DPMptf = 0.4371314
