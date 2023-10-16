@@ -1,29 +1,12 @@
-# 0. File Information ----
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# 
-# This R script is the first attempt at RothC model SIMULATION using SoilR.
-# The code below follows the code set out at the following resource:
-# https://fao-gsp.github.io/GSOCseq/software-environment.html
-# 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-# 1. Required Packages/Dependencies ----
+# Required Packages/Dependencies
 
 library(pacman)
 p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula)
 
-# GSOC METHOD ----
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# NB I am setting up these data to track that used for the PD1 MR1 Farm: Storms River.
-#   Weather File = JANSENVILLE
-#   Stratum = Knysna-Amatole montane forests / Cfb : Temperate, no dry season, warm summer
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
 # GET DELTA SOC VIA ROTH C (Function)
 
 Get_Delta_SOC_RothC = function(Years, Weather_File, Edaphic_File, ALMP_File_BL, ALMP_File_PR, Calibrated_Model) {
+  
   Roth_C<-function(years,
                    weather_file,
                    edaphic_file,
@@ -83,26 +66,25 @@ Get_Delta_SOC_RothC = function(Years, Weather_File, Edaphic_File, ALMP_File_BL, 
                              solver = deSolve.lsoda.wrapper)
     
     Ct3_spin=getC(Model3_spin)
-    
-    # Get the final pools of the time series
-    poolSize3_spin=as.numeric(tail(Ct3_spin,1))
-    names(poolSize3_spin)<-c("DPM", "RPM", "BIO", "HUM", "IOM")
-    
-    SOC_Result = sum(poolSize3_spin)
-    
-    return(poolSize3_spin)
+    colnames(Ct3_spin)<-c("DPM", "RPM", "BIO", "HUM", "IOM")
+    Model_Result = as.data.frame(Ct3_spin)
+    Model_Result$SOC_Stock = Model_Result$DPM + Model_Result$RPM + Model_Result$BIO + Model_Result$HUM + Model_Result$IOM
+    return(Model_Result)
   }
   
   SOC_BL = Roth_C(years = Years, weather_file = Weather_File, edaphic_file = Edaphic_File, ALMP_file = ALMP_File_BL, calibrated_model = Calibrated_Model)
+  names(SOC_BL) = paste0(names(SOC_BL), "_BL")
   SOC_PR = Roth_C(years = Years, weather_file = Weather_File, edaphic_file = Edaphic_File, ALMP_file = ALMP_File_PR, calibrated_model = Calibrated_Model)
+  names(SOC_PR) = paste0(names(SOC_PR), "_PR")
+  
+  SOC_MODEL_RESULT = cbind(SOC_BL, SOC_PR)
+  
   cat("\n","BASELINE:", "\n","\n")
   print(SOC_BL)
   cat("\n","PROJECT", "\n","\n")
   print(SOC_PR)
-  cat("\n","DELTA", "\n","\n")
-  Delta_SOC = sum(SOC_PR) - sum(SOC_BL)
-  print(Delta_SOC)
-  return(Delta_SOC)
+  
+  return(SOC_MODEL_RESULT)
 }
 
 # Defining the input variables BASELINE ----
@@ -128,7 +110,7 @@ ALMP_PR = data.frame("Month" = 1:12,
                      "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0),
                      "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
 
-calibrated_model = data.frame("Soil_Carbon_Pool" = c("DPMptf", "RPMptf", "BIOptf", "HUMptf", "FallIOM"),
+calibrated_model_Input = data.frame("Soil_Carbon_Pool" = c("DPMptf", "RPMptf", "BIOptf", "HUMptf", "FallIOM"),
                               "Value" = c(0.4381499, 13.8652529, 1.9964292, 71.2632778, 9.0259982))
 
 years_input = seq(1/12,2,by=1/12) 
@@ -138,4 +120,66 @@ Delta_Test = Get_Delta_SOC_RothC(Years = years_input,
                                  Edaphic_File = STRATUM_Edaphic_File, 
                                  ALMP_File_BL = ALMP_BL, 
                                  ALMP_File_PR = ALMP_PR, 
-                                 Calibrated_Model = calibrated_model)
+                                 Calibrated_Model = calibrated_model_Input)
+
+
+# Old Code - - - - - -
+
+# - - - - - - - - - - -
+
+fT.RothC_CNG = function (Temp) {
+  47.91/(1 + exp(106.06/(ifelse(Temp >= -18.27, Temp, NA) + 18.27)))
+}
+
+fT = fT.RothC_CNG(JANSENVILLE_Weather_File[,2]) # Temperature effects per month
+
+fw1func<-function(P, E, S.Thick, pClay, pE = 1, bare) {
+  M = P - E * pE
+  Acc.TSMD = NULL
+  for (i in 2:length(M)) {
+    B = ifelse(bare[i] == FALSE, 1, 1.8)
+    Max.TSMD = -(20 + 1.3 * pClay - 0.01 * (pClay^2)) * (S.Thick/23) * (1/B)
+    Acc.TSMD[1] = ifelse(M[1] > 0, 0, M[1])
+    if (Acc.TSMD[i - 1] + M[i] < 0) {
+      Acc.TSMD[i] = Acc.TSMD[i - 1] + M[i]
+    } else 
+      (Acc.TSMD[i] = 0)
+    if (Acc.TSMD[i] <= Max.TSMD) {
+      Acc.TSMD[i] = Max.TSMD
+    }
+  }
+  b = ifelse(Acc.TSMD > 0.444 * Max.TSMD, 1, (0.2 + 0.8 * ((Max.TSMD - Acc.TSMD)/(Max.TSMD - 0.444 * Max.TSMD))))
+  b<-clamp(b,lower=0.2)
+  return(data.frame(Acc.TSMD, b, Max.TSMD))
+}
+
+fW_2<- fw1func(P=(JANSENVILLE_Weather_File[,3]), E=(JANSENVILLE_Weather_File[,4]), S.Thick = STRATUM_Edaphic_File$Soil_Depth, pClay = STRATUM_Edaphic_File$ClayPerc_Stratum, pE = 1, bare=ALMP_BL$Bare)$b
+
+Cov2 = ALMP_BL[,c("Month","Bare")] %>%
+  mutate(Bare = ifelse(Bare == TRUE, 1,0.6))
+
+fC <- Cov2[,2]
+
+# Set the factors frame for Model calculations
+xi.frame=data.frame(years,rep(fT*fW_2*fC,length.out=length(years)))
+
+# RUN THE MODEL FROM SOILR
+Model3_spin = RothCModel(t = years,
+                         C0 = c(calibrated_model[1,2], 
+                                calibrated_model[2,2], 
+                                calibrated_model[3,2], 
+                                calibrated_model[4,2], 
+                                calibrated_model[5,2]),
+                         ks = c(k.DPM = 10, k.RPM = 0.3, k.BIO = 0.66, k.HUM = 0.02, k.IOM = 0),
+                         In = ALMP_BL$Cinput[1],
+                         FYM = ALMP_BL$FYM[1],
+                         DR = 1.44,
+                         clay = STRATUM_Edaphic_File$ClayPerc_Stratum,
+                         xi = xi.frame, 
+                         pass = TRUE, 
+                         solver = deSolve.lsoda.wrapper)
+
+Ct3_spin=getC(Model3_spin)
+colnames(Ct3_spin)<-c("DPM", "RPM", "BIO", "HUM", "IOM")
+Model_Result = as.data.frame(Ct3_spin)
+Model_Result$SOC_Stock = Model_Result$DPM + Model_Result$RPM + Model_Result$BIO + Model_Result$HUM + Model_Result$IOM
