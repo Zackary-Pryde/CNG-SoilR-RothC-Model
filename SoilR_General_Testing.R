@@ -125,8 +125,8 @@ Delta_Test = Get_Delta_SOC_RothC(Years = years_input,
 Delta_Test$Month = 1:24
 
 ggplot(data = Delta_Test, aes(x = Month)) + theme_minimal() + 
-  geom_line(aes(y = SOC_Stock_BL), color = "darkblue", linetype = "dashed") + 
-  geom_line(aes(y = SOC_Stock_PR), color = "darkred", linetype = "dashed") +
+  geom_line(aes(y = SOC_Stock_BL), color = "darkblue", linetype = "dashed", lwd = 0.75) + 
+  geom_line(aes(y = SOC_Stock_PR), color = "darkred", linetype = "dashed", lwd = 0.75) +
   labs(x = "Month",
        y = "SOC (t/Ha)",
        title = "Storms River Over Two Project Years")
