@@ -24,11 +24,10 @@ p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula)
 # ROTH C MODEL FUNCTION .
 Roth_C<-function(Cinputs,years,
                  DPMptf, RPMptf, BIOptf, HUMptf, FallIOM,
-                 Temp,Precip,Evp,Cov2,soil.thick,SOC,clay,DR,bare1){
-  #Temperature factor per month
+                 Temp,Precip,Evp,soil.thick,SOC,clay,DR,bare1){
+  
   fT=fT.RothC(Temp[,2])
   
-  #Moisture effects per month . 
   fw1func<-function(P, E, S.Thick = 30, pClay = 32.0213, pE = 1, bare) {
     M = P - E * pE
     Acc.TSMD = NULL
@@ -51,14 +50,16 @@ Roth_C<-function(Cinputs,years,
   
   fW_2<- fw1func(P=(Precip[,2]), E=(Evp[,2]), S.Thick = soil.thick, pClay = clay, pE = 1, bare=bare1$Soil_Cover)$b
   
-  #Vegetation Cover effects 
+  Cov2 = bc %>%
+    mutate(Soil_Cover = ifelse(Soil_Cover == TRUE, 1,0.6))
+  
   fC <- Cov2[,2]
   
   # Set the factors frame for Model calculations
-  xi.frame=data.frame(years,rep(fT*fW_2*fC*fPR,length.out=length(years)))
+  xi.frame=data.frame(years,rep(fT*fW_2*fC,length.out=length(years)))
   
   # RUN THE MODEL FROM SOILR
-  Model3_spin=RothCModel(t=years,C0=c(DPMptf, RPMptf, BIOptf, HUMptf, FallIOM),In=Cinputs,DR=DR,clay=clay,xi=xi.frame, pass=TRUE) 
+  Model3_spin=RothCModel(t=years,C0=c(DPMptf, RPMptf, BIOptf, HUMptf, FallIOM),In=Cinputs,DR=1.44,clay=clay,xi=xi.frame, pass=TRUE, solver = deSolve.lsoda.wrapper) 
   Ct3_spin=getC(Model3_spin)
   
   # Get the final pools of the time series
@@ -79,26 +80,21 @@ Evp=data.frame(Month=1:12, Evp=c(12, 18, 35, 58, 82, 90, 97, 84, 54, 31,14, 10))
 bc = data.frame("Month" = 1:12,
                 "Bare" = c(FALSE,FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE))
 
-Cov2 = bc %>%
-  mutate(Soil_Cover = ifelse(Soil_Cover == TRUE, 1,0.6))
 
 soil.thick = 30 # Soil thickness (organic layer topsoil) (cm)
-SOC = 97.4651688163155 # Soil Organic Carbon Stock (Mg/ha). NB: Mg refers to Megagram = metric Tonne.
-clay = 21.4800892252279 # Percent clay (%)
-Cinputs = 0.5 # Annual C inputs to soil (Mg/ha/yr). NB: This is the value that we need to check on. For now, Ill assume its the same as that used to calibrate
-
-fPR = 1 # Related to the land use/cover category... 
+clay = 21.4800 # Percent clay (%)
+#Cinputs = 
 
 DR = 1.44 # Havent defined this yet
 
 # Initial conditions from spin up
-DPMptf = 0.6396 
-RPMptf = 13.2247
-BIOptf = 1.8943 
-HUMptf = 72.5269 
-FallIOM = 9.0260
+DPMptf = 0.4371314
+RPMptf = 13.8658136
+BIOptf = 1.9966239
+HUMptf = 71.2542223
+FallIOM = 9.0259982
 
-years = seq(1/12,3,by=1/12) 
+years = seq(1/12,2,by=1/12) 
 
 #SOC_BL = 
 
