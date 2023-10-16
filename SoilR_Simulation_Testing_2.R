@@ -22,17 +22,19 @@ p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 # ROTH C MODEL FUNCTION .
-Roth_C<-function(Cinputs,years,
-                 DPMptf, RPMptf, BIOptf, HUMptf, FallIOM,
-                 Temp,Precip,Evp,soil.thick,clay,DR,bare1){
+Roth_C<-function(years,
+                 weather_file,
+                 edaphic_file,
+                 ALMP_file, 
+                 calibrated_model){
   
   fT.RothC_CNG = function (Temp) {
     47.91/(1 + exp(106.06/(ifelse(Temp >= -18.27, Temp, NA) + 18.27)))
   }
   
-  fT = fT.RothC_CNG(Weather_File[,2]) # Temperature effects per month
+  fT = fT.RothC_CNG(weather_file[,2]) # Temperature effects per month
   
-  fw1func<-function(P, E, S.Thick = 30, pClay = 32.0213, pE = 1, bare) {
+  fw1func<-function(P, E, S.Thick, pClay, pE = 1, bare) {
     M = P - E * pE
     Acc.TSMD = NULL
     for (i in 2:length(M)) {
@@ -52,10 +54,10 @@ Roth_C<-function(Cinputs,years,
     return(data.frame(Acc.TSMD, b, Max.TSMD))
     }
   
-  fW_2<- fw1func(P=(Precip[,2]), E=(Evp[,2]), S.Thick = soil.thick, pClay = clay, pE = 1, bare=bare1$Soil_Cover)$b
+  fW_2<- fw1func(P=(weather_file[,3]), E=(weather_file[,4]), S.Thick = edaphic_file$Soil_Depth, pClay = edaphic_file$ClayPerc_Stratum, pE = 1, bare=ALMP_file$Bare)$b
   
-  Cov2 = bc %>%
-    mutate(Soil_Cover = ifelse(Soil_Cover == TRUE, 1,0.6))
+  Cov2 = ALMP_file[,c("Month","Bare")] %>%
+    mutate(Soil_Cover = ifelse(Bare == TRUE, 1,0.6))
   
   fC <- Cov2[,2]
   
@@ -63,12 +65,38 @@ Roth_C<-function(Cinputs,years,
   xi.frame=data.frame(years,rep(fT*fW_2*fC,length.out=length(years)))
   
   # RUN THE MODEL FROM SOILR
-  Model3_spin=RothCModel(t=years,C0=c(DPMptf, RPMptf, BIOptf, HUMptf, FallIOM),In=Cinputs,DR=1.44,clay=clay,xi=xi.frame, pass=TRUE, solver = deSolve.lsoda.wrapper) 
+  Model3_spin = RothCModel(t = years,
+                           C0 = c(calibrated_model[1,2], 
+                                  calibrated_model[2,2], 
+                                  calibrated_model[3,2], 
+                                  calibrated_model[4,2], 
+                                  calibrated_model[5,2]),
+                           ks = c(k.DPM = 10, k.RPM = 0.3, k.BIO = 0.66, k.HUM = 0.02, k.IOM = 0),
+                           In = ALMP_file$Cinput[1],
+                           FYM = ALMP_file$FYM[1],
+                           DR = 1.44,
+                           clay = edaphic_file$ClayPerc_Stratum,
+                           xi = xi.frame, 
+                           pass = TRUE, 
+                           solver = deSolve.lsoda.wrapper)
+  
   Ct3_spin=getC(Model3_spin)
   
   # Get the final pools of the time series
   poolSize3_spin=as.numeric(tail(Ct3_spin,1))
-  return(poolSize3_spin)
+  names(poolSize3_spin)<-c("DPM", "RPM", "BIO", "HUM", "IOM")
+  
+  SOC_Result = sum(poolSize3_spin)
+  
+  cat("\n","SIMULATION COMPLETE:", "\n","\n")
+  
+  print(poolSize3_spin)
+  
+  cat("\n","Modelled SOC after ",length(years)/12," years = ",SOC_Result, " (t/ha)")
+  
+  #print(paste0("Modelled SOC after ",length(years)/12," years = ",SOC_Result, " (t/ha)"))
+  
+  #return(poolSize3_spin)
 }
 
 # Defining the input variables BASELINE ----
@@ -94,14 +122,19 @@ ALMP_PR = data.frame("Month" = 1:12,
                      "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0),
                      "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
 
-# Initial conditions from spin up
-DPMptf = 0.4371314
-RPMptf = 13.8658136
-BIOptf = 1.9966239
-HUMptf = 71.2542223
-FallIOM = 9.0259982
+calibrated_model = data.frame("Soil_Carbon_Pool" = c("DPMptf", "RPMptf", "BIOptf", "HUMptf", "FallIOM"),
+                              "Value" = c(0.4381499, 13.8652529, 1.9964292, 71.2632778, 9.0259982))
 
 years = seq(1/12,2,by=1/12) 
 
-#SOC_BL = 
+Roth_C(years = years,
+       weather_file = JANSENVILLE_Weather_File, 
+       edaphic_file = STRATUM_Edaphic_File, 
+       ALMP_file = ALMP_BL, 
+       calibrated_model = calibrated_model)
 
+Roth_C(years = years,
+       weather_file = JANSENVILLE_Weather_File, 
+       edaphic_file = STRATUM_Edaphic_File, 
+       ALMP_file = ALMP_PR, 
+       calibrated_model = calibrated_model)
