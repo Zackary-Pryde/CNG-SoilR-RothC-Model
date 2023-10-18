@@ -124,6 +124,7 @@ Delta_Test = Get_Delta_SOC_RothC(Years = years_input,
                                  ALMP_File_PR = ALMP_PR, 
                                  Calibrated_Model = calibrated_model_Input)
 
+
 Delta_Test$Month = 1:24
 
 ggplot(data = Delta_Test, aes(x = Month)) + theme_minimal() + 
