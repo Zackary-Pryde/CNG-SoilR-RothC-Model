@@ -147,11 +147,12 @@ TEST = Get_Delta_SOC_RothC(Weather_File = JANSENVILLE_Weather_File,
 
 RESULT = do.call(rbind,TEST)
 
-Delta_Test$Month = 1:24
+RESULT$Month = 1:24
 
-ggplot(data = Delta_Test, aes(x = Month)) + theme_minimal() + 
+ggplot(data = RESULT, aes(x = Month)) + theme_minimal() + 
   geom_line(aes(y = SOC_Stock_BL), color = "darkblue", linetype = "dashed", lwd = 0.75) + 
   geom_line(aes(y = SOC_Stock_PR), color = "darkred", linetype = "dashed", lwd = 0.75) +
   labs(x = "Month",
        y = "SOC (t/Ha)",
-       title = "Storms River Over Two Project Years")
+       title = "Storms River Over Two Project Years") + 
+  geom_vline(xintercept = c(1,13), linetype = "dashed", color = "darkgray")
