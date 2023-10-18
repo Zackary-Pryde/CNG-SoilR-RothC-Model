@@ -11,7 +11,7 @@
 # 1. Required Packages/Dependencies ----
 
 library(pacman)
-p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula)
+p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula, tidyverse)
 
 # GSOC METHOD ----
 

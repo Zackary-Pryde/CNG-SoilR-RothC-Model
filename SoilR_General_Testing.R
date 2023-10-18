@@ -3,6 +3,8 @@
 library(pacman)
 p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula, ggplot2)
 
+# install.packages("rtools")
+
 # GET DELTA SOC VIA ROTH C (Function)
 
 Get_Delta_SOC_RothC = function(Years, Weather_File, Edaphic_File, ALMP_File_BL, ALMP_File_PR, Calibrated_Model) {
