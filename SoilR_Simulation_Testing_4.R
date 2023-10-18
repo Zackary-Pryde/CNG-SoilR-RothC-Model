@@ -3,7 +3,6 @@
 library(pacman)
 p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula, ggplot2, tidyverse)
 
-
 JANSENVILLE_Weather_File = data.frame("Month" = 1:12,
                                       "Temp" = c(24.75, 24.75, 22.8, 19.7, 15.55, 12.75, 12.2, 14.45, 16.95, 19.15, 21.35, 23.3),
                                       "Precip" = c(25.83, 27.65, 44.31, 27.65, 11.77, 7.9, 13.69, 16.54, 13.69, 21.23, 29.46, 25.83),
@@ -149,10 +148,13 @@ RESULT = do.call(rbind,TEST)
 
 RESULT$Month = 1:24
 
+nrow(RESULT)
+
 ggplot(data = RESULT, aes(x = Month)) + theme_minimal() + 
-  geom_line(aes(y = SOC_Stock_BL), color = "darkblue", linetype = "dashed", lwd = 0.75) + 
+  geom_line(aes(y = SOC_Stock_BL), color = "darkblue", linetype = "dashed", lwd = 0.75, label = "Baseline") + 
   geom_line(aes(y = SOC_Stock_PR), color = "darkred", linetype = "dashed", lwd = 0.75) +
   labs(x = "Month",
-       y = "SOC (t/Ha)",
+       y = "SOC Stocks (t/Ha)",
        title = "Storms River Over Two Project Years") + 
-  geom_vline(xintercept = c(1,13), linetype = "dashed", color = "darkgray")
+  geom_vline(xintercept = c(1,13), linetype = "dashed", color = "darkgray") # + annotate("text", x=0.7, y=1.9, label="bc") ADD FOR TEXT ON PLOT 
+  # theme(axis.title.x = element_text(vjust=1), axis.title.y = element_text(vjust=1), plot.margin = unit(c(0.5,0.5,0.5,0.5), "cm"), panel.grid.minor = element_blank(), panel.grid.major = element_blank(), aspect.ratio = 3/4)
