@@ -4,7 +4,6 @@ library(pacman)
 # rgdal not installing from CRAN
 p_load(raster, ncdf4, SoilR, abind, soilassessment, Formula, ggplot2, tidyverse)
 
-
 JANSENVILLE_Weather_File = data.frame("Month" = 1:12,
                                       "Temp" = c(24.75, 24.75, 22.8, 19.7, 15.55, 12.75, 12.2, 14.45, 16.95, 19.15, 21.35, 23.3),
                                       "Precip" = c(25.83, 27.65, 44.31, 27.65, 11.77, 7.9, 13.69, 16.54, 13.69, 21.23, 29.46, 25.83),
@@ -24,7 +23,7 @@ ALMP_PR = data.frame("Month" = 1:24,
                      "Bare" = c(FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
                                 FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
                      "Cinput" = c(rep(1.56466235908391, 12), 
-                                  rep(1.96466235908391, 12)),
+                                  rep(1.96466235908391, 12)),# 1.96466235908391
                      "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0,
                                0,0.5,0.5,0.5,0.5,0.5,0,0,0,0,0,0),
                      "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0,
