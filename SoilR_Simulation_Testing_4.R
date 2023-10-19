@@ -1,7 +1,9 @@
 # Required Packages/Dependencies TTT
 
 library(pacman)
-p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula, ggplot2, tidyverse)
+# rgdal not installing from CRAN
+p_load(raster, ncdf4, SoilR, abind, soilassessment, Formula, ggplot2, tidyverse)
+
 
 JANSENVILLE_Weather_File = data.frame("Month" = 1:12,
                                       "Temp" = c(24.75, 24.75, 22.8, 19.7, 15.55, 12.75, 12.2, 14.45, 16.95, 19.15, 21.35, 23.3),
@@ -33,7 +35,7 @@ calibrated_model_Input = data.frame("Soil_Carbon_Pool" = c("DPMptf", "RPMptf", "
 
 Get_Delta_SOC_RothC = function(Weather_File, Edaphic_File, ALMP_File_BL, ALMP_File_PR, Calibrated_Model) {
   
-  Years = seq(1/12,1,1/12) # Always 1 year
+  Years = seq(1/12,2,1/12) # Always 1 year
   num_years = ceiling(nrow(ALMP_File_PR)/12)
   month_ranges <- split(ALMP_File_PR, factor(rep(1:num_years, each = 12)))
   
@@ -126,13 +128,17 @@ Get_Delta_SOC_RothC = function(Weather_File, Edaphic_File, ALMP_File_BL, ALMP_Fi
     cat("\n","PROJECT", "\n","\n")
     print(SOC_PR)
     
-    SOC_MODEL_RESULT[[year_index]] = cbind(SOC_BL, SOC_PR)
     
     Calibrated_Model_i_pr = data.frame("Soil_Carbon_Pool" = c("DPMptf", "RPMptf", "BIOptf", "HUMptf", "FallIOM"),
-                                       "Value" = c(SOC_PR[12,1:5]$DPM_PR, SOC_PR[12,1:5]$RPM_PR, SOC_PR[12,1:5]$BIO_PR, SOC_PR[12,1:5]$HUM_PR, SOC_PR[12,1:5]$IOM_PR))
+                                       "Value" = c(SOC_PR[13,1:5]$DPM_PR, SOC_PR[13,1:5]$RPM_PR, SOC_PR[13,1:5]$BIO_PR, SOC_PR[13,1:5]$HUM_PR, SOC_PR[13,1:5]$IOM_PR))
     
     Calibrated_Model_i_bl = data.frame("Soil_Carbon_Pool" = c("DPMptf", "RPMptf", "BIOptf", "HUMptf", "FallIOM"),
-                                       "Value" = c(SOC_BL[12,1:5]$DPM_BL, SOC_BL[12,1:5]$RPM_BL, SOC_BL[12,1:5]$BIO_BL, SOC_BL[12,1:5]$HUM_BL, SOC_BL[12,1:5]$IOM_BL))
+                                       "Value" = c(SOC_BL[13,1:5]$DPM_BL, SOC_BL[13,1:5]$RPM_BL, SOC_BL[13,1:5]$BIO_BL, SOC_BL[13,1:5]$HUM_BL, SOC_BL[13,1:5]$IOM_BL))
+    
+    SOC_BL = SOC_BL[1:12,]
+    SOC_PR = SOC_PR[1:12,]
+    
+    SOC_MODEL_RESULT[[year_index]] = cbind(SOC_BL, SOC_PR)
   }
   
   return(SOC_MODEL_RESULT)
