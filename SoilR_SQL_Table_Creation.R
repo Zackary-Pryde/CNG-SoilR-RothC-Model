@@ -73,8 +73,7 @@ create_table_sql <- "
     SOC_Percentage FLOAT,
     Bulk_Density FLOAT,
     Soil_Depth FLOAT,
-    SOC_Stock FLOAT,
-    Calculated_IOM FLOAT
+    SOC_Stock FLOAT
   )
 "
 
@@ -111,8 +110,7 @@ create_table_sql <- "
     RPM FLOAT,
     BIO FLOAT,
     HUM FLOAT,
-    IOM FLOAT,
-    SOC_Stock FLOAT
+    IOM FLOAT
   )
 "
 

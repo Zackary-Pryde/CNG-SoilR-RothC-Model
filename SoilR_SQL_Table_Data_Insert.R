@@ -26,7 +26,7 @@ connection <- odbc::dbConnect(odbc(),Driver = "ODBC Driver 17 for SQL Server",
                               PWD = key_get("Password", keyring ="cng_SQL_Credentials"))
 keyring_lock("cng_SQL_Credentials")
 
-# Weather File to be inserted
+# Weather File to be inserted - - - - - - - - - - - - - -
 
 JANSENVILLE_Weather_File = data.frame("Month" = 1:12,
                                       "Temperature" = c(24.75, 24.75, 22.8, 19.7, 15.55, 12.75, 12.2, 14.45, 16.95, 19.15, 21.35, 23.3),
@@ -38,3 +38,34 @@ DF = JANSENVILLE_Weather_File
 DB <- dbGetQuery(connection, "SELECT * FROM dbo.SoilR_Weather_File")
 DB = rbind(DB, DF)
 dbWriteTable(connection, name = "SoilR_Weather_File", DB, overwrite = TRUE)
+
+# Stratum File to be inserted - - - - - - - - - - - - - -
+
+STRATUM_Edaphic_File = data.frame("Stratum" = "Storms River Testing",
+                                  "Clay_Percentage" = 21.4800,
+                                  "SOC_Percentage" = NA,
+                                  "Bulk_Density" = NA,
+                                  "Soil_Depth" = 30.0000,
+                                  "SOC_Stock" = 97.4651)
+
+DF = STRATUM_Edaphic_File
+DB <- dbGetQuery(connection, "SELECT * FROM dbo.SoilR_Stratum_File")
+DB = rbind(DB, DF)
+dbWriteTable(connection, name = "SoilR_Stratum_File", DB, overwrite = TRUE)
+
+# Calibrated Model File to be inserted - - - - - - - - - - - - - -
+
+Calibrated_Model = data.frame("Model_Name" = "",
+                              "Stratum" = "",
+                              "Weather_Station" = "",
+                              "Cinput" = ,
+                              "DPM" = ,
+                              "RPM" = ,
+                              "BIO" = ,
+                              "HUM" = ,
+                              "IOM" = )
+
+DF = Calibrated_Model
+DB <- dbGetQuery(connection, "SELECT * FROM dbo.SoilR_Calibrated_Model")
+DB = rbind(DB, DF)
+dbWriteTable(connection, name = "SoilR_Calibrated_Model", DB, overwrite = TRUE)
