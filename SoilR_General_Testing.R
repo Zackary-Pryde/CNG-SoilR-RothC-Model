@@ -91,31 +91,32 @@ Get_Delta_SOC_RothC = function(Years, Weather_File, Edaphic_File, ALMP_File_BL, 
 
 # Defining the input variables BASELINE ----
 
-JANSENVILLE_Weather_File = data.frame("Month" = 1:12,
-                                      "Temp" = c(24.75, 24.75, 22.8, 19.7, 15.55, 12.75, 12.2, 14.45, 16.95, 19.15, 21.35, 23.3),
-                                      "Precip" = c(25.83, 27.65, 44.31, 27.65, 11.77, 7.9, 13.69, 16.54, 13.69, 21.23, 29.46, 25.83),
-                                      "Evp" = c(8.55, 7.97, 6.17, 4.76, 3.64, 2.98, 3.13, 4.06, 5.29, 6.46, 8.29, 8.87))
+PE_Weather_File = data.frame("Month" = 1:12,
+                                      "Temp" = c(21.65, 21.65, 20.75, 18.65, 16.6, 14.75, 14.25, 14.7, 15.7, 16.95, 18.45, 20.35),
+                                      "Precip" = c(33.93, 37.44, 49.33, 52.62, 53.43, 55.85, 43.47, 57.45, 56.65, 53.43, 45.16, 32.15),
+                                      "Evp" = c(4.33, 3.97, 3.11, 2.25, 1.62, 1.25, 1.35, 1.7, 2.25, 2.8, 3.76, 4.37))
 
 STRATUM_Edaphic_File = data.frame("Soil_Depth" = 30,
-                                  "SOC_Stratum" = 97.4651,
-                                  "ClayPerc_Stratum" = 21.4800)
+                                  "SOC_Stratum" = 101,5612,
+                                  "ClayPerc_Stratum" = 19.15011601)
 
 ALMP_BL = data.frame("Month" = 1:12,
-                     "Bare" = c(FALSE,FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
-                     "Cinput" = rep(1.18131300047788, 12),
+                     "Bare" = c(TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
+                     "Cinput" = rep(1.7905717499028, 12),
                      "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0),
-                     "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
+                     "Irrigation" = c(9.175,9.175,9.175,9.175,9.175,9.175,9.175,9.175,9.175,9.175,9.175,9.175))
 
 ALMP_PR = data.frame("Month" = 1:12,
                      "Bare" = c(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
-                     "Cinput" = rep(1.56466235908391, 12),
+                     "Cinput" = rep(1.7905717499028, 12),
                      "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0),
-                     "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
+                     "Irrigation" = c(9.175,9.175,9.175,9.175,9.175,9.175,9.175,9.175,9.175,9.175,9.175,9.175))
+
 
 calibrated_model_Input = data.frame("Soil_Carbon_Pool" = c("DPMptf", "RPMptf", "BIOptf", "HUMptf", "FallIOM"),
-                              "Value" = c(0.4510887, 13.3954103, 1.9193236, 72.2360421, 9.0259982))
+                              "Value" = c(2.9961, 26.0908, 3.4416, 61.9632, 7.0695))
 
-years_input = seq(1/12,2,by=1/12) 
+years_input = seq(1/12,1,by=1/12) 
 
 Delta_Test = Get_Delta_SOC_RothC(Years = years_input, 
                                  Weather_File = JANSENVILLE_Weather_File, 
