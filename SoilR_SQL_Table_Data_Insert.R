@@ -71,16 +71,35 @@ dbWriteTable(connection, name = "SoilR_Calibrated_Model", DB, overwrite = TRUE)
 
 # ALM File to be inserted - - - - - - - - - - - - - -
 
-Calibrated_Model = data.frame("Model_Name" = "Test - JANSENVILLE",
-                              "Stratum" = "Test",
-                              "Weather_Station" = "JANSENVILLE",
-                              "DPM" = 0.4510887,
-                              "RPM" = 13.3954103,
-                              "BIO" = 1.9193236,
-                              "HUM" = 72.2360421,
-                              "IOM" = 9.0259982)
+ALM_File = data.frame("FarmID" = rep(66,12),
+                      "FieldID" = rep(14097,12),
+                      "Scenario" = "Baseline",
+                      "Month" = 1:12,
+                      "Bare" = c(FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
+                      "Cinput" = rep(1.18131300047788, 12),
+                      "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0),
+                      "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
 
-DF = Calibrated_Model
-DB <- dbGetQuery(connection, "SELECT * FROM dbo.SoilR_Calibrated_Model")
+DF = ALM_File
+DB <- dbGetQuery(connection, "SELECT * FROM dbo.SoilR_ALM_File")
 DB = rbind(DB, DF)
-dbWriteTable(connection, name = "SoilR_Calibrated_Model", DB, overwrite = TRUE)
+dbWriteTable(connection, name = "SoilR_ALM_File", DB, overwrite = TRUE)
+
+# Project
+ALM_File = data.frame("FarmID" = rep(66,24),
+                      "FieldID" = rep(14097,24),
+                      "Scenario" = "Project",
+                      "Month" = 1:24,
+                      "Bare" = c(FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+                                 FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
+                      "Cinput" = c(rep(1.56466235908391, 12), 
+                                   rep(1.96466235908391, 12)),
+                      "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0,
+                                0,0.5,0.5,0.5,0.5,0.5,0,0,0,0,0,0),
+                      "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0,
+                                       0,0,0,0,0,0,0,0,0,0,0,0))
+
+DF = ALM_File
+DB <- dbGetQuery(connection, "SELECT * FROM dbo.SoilR_ALM_File")
+DB = rbind(DB, DF)
+dbWriteTable(connection, name = "SoilR_ALM_File", DB, overwrite = TRUE)
