@@ -14,7 +14,7 @@ STRATUM_Edaphic_File = data.frame("Soil_Depth" = 30,
                                   "ClayPerc_Stratum" = 21.4800)
 
 ALMP_BL = data.frame("Month" = 1:12,
-                     "Bare" = c(FALSE,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
+                     "Bare" = c(FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
                      "Cinput" = rep(1.18131300047788, 12),
                      "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0),
                      "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
