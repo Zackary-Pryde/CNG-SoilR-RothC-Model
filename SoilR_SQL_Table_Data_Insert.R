@@ -68,3 +68,19 @@ DF = Calibrated_Model
 DB <- dbGetQuery(connection, "SELECT * FROM dbo.SoilR_Calibrated_Model")
 DB = rbind(DB, DF)
 dbWriteTable(connection, name = "SoilR_Calibrated_Model", DB, overwrite = TRUE)
+
+# ALM File to be inserted - - - - - - - - - - - - - -
+
+Calibrated_Model = data.frame("Model_Name" = "Test - JANSENVILLE",
+                              "Stratum" = "Test",
+                              "Weather_Station" = "JANSENVILLE",
+                              "DPM" = 0.4510887,
+                              "RPM" = 13.3954103,
+                              "BIO" = 1.9193236,
+                              "HUM" = 72.2360421,
+                              "IOM" = 9.0259982)
+
+DF = Calibrated_Model
+DB <- dbGetQuery(connection, "SELECT * FROM dbo.SoilR_Calibrated_Model")
+DB = rbind(DB, DF)
+dbWriteTable(connection, name = "SoilR_Calibrated_Model", DB, overwrite = TRUE)
