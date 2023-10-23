@@ -70,7 +70,7 @@ Get_Delta_SOC_RothC = function(Weather_File, Edaphic_File, ALMP_File_BL, ALMP_Fi
       return(data.frame(Acc.TSMD, b, Max.TSMD))
     }
     
-    fW_2<- fw1func(P=(weather_file[,3]), E=(weather_file[,4]), S.Thick = edaphic_file$Soil_Depth, pClay = edaphic_file$ClayPerc_Stratum, pE = 1, bare=ALMP_file$Bare)$b
+    fW_2<- fw1func(P=(weather_file[,3] + ALMP_file[,8]), E=(weather_file[,4]), S.Thick = edaphic_file$Soil_Depth, pClay = edaphic_file$ClayPerc_Stratum, pE = 1, bare=ALMP_file$Bare)$b
     
     Cov2 = ALMP_file[,c("Month","Bare")] %>%
       mutate(Bare = ifelse(Bare == TRUE, 1,0.6))
