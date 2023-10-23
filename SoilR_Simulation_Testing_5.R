@@ -1,36 +1,9 @@
 # Required Packages/Dependencies TTT
 
 library(pacman)
-# rgdal not installing from CRAN
 p_load(raster, ncdf4, SoilR, abind, soilassessment, Formula, ggplot2, tidyverse)
 
-JANSENVILLE_Weather_File = data.frame("Month" = 1:12,
-                                      "Temp" = c(24.75, 24.75, 22.8, 19.7, 15.55, 12.75, 12.2, 14.45, 16.95, 19.15, 21.35, 23.3),
-                                      "Precip" = c(25.83, 27.65, 44.31, 27.65, 11.77, 7.9, 13.69, 16.54, 13.69, 21.23, 29.46, 25.83),
-                                      "Evp" = c(8.55, 7.97, 6.17, 4.76, 3.64, 2.98, 3.13, 4.06, 5.29, 6.46, 8.29, 8.87))
-
-STRATUM_Edaphic_File = data.frame("Soil_Depth" = 30,
-                                  "SOC_Stratum" = 97.4651,
-                                  "ClayPerc_Stratum" = 21.4800)
-
-ALMP_BL = data.frame("Month" = 1:12,
-                     "Bare" = c(FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
-                     "Cinput" = rep(1.18131300047788, 12),
-                     "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0),
-                     "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
-
-ALMP_PR = data.frame("Month" = 1:24,
-                     "Bare" = c(FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
-                                FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
-                     "Cinput" = c(rep(1.56466235908391, 12), 
-                                  rep(1.96466235908391, 12)),# 1.96466235908391
-                     "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0,
-                               0,0.5,0.5,0.5,0.5,0.5,0,0,0,0,0,0),
-                     "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0,
-                                      0,0,0,0,0,0,0,0,0,0,0,0))
-
-calibrated_model_Input = data.frame("Soil_Carbon_Pool" = c("DPMptf", "RPMptf", "BIOptf", "HUMptf", "FallIOM"),
-                                    "Value" = c(0.4510887, 13.3954103, 1.9193236, 72.2360421, 9.0259982))
+# Come up with Function Inputs that obtain the data from the SQL database ***
 
 Get_Delta_SOC_RothC = function(Weather_File, Edaphic_File, ALMP_File_BL, ALMP_File_PR, Calibrated_Model) {
   
