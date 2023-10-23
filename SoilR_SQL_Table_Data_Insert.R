@@ -55,9 +55,9 @@ dbWriteTable(connection, name = "SoilR_Stratum_File", DB, overwrite = TRUE)
 
 # Calibrated Model File to be inserted - - - - - - - - - - - - - -
 
-Calibrated_Model = data.frame("Model_Name" = "",
-                              "Stratum" = "",
-                              "Weather_Station" = "",
+Calibrated_Model = data.frame("Model_Name" = "Test - JANSENVILLE",
+                              "Stratum" = "Test",
+                              "Weather_Station" = "JANSENVILLE",
                               "Cinput" = ,
                               "DPM" = ,
                               "RPM" = ,

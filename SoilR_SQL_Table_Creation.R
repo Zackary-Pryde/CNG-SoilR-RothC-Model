@@ -105,7 +105,6 @@ create_table_sql <- "
     Model_Name VARCHAR(MAX),
     Stratum VARCHAR(MAX),
     Weather_Station VARCHAR(MAX),
-    Cinput FLOAT,
     DPM FLOAT,
     RPM FLOAT,
     BIO FLOAT,
