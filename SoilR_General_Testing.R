@@ -1,7 +1,7 @@
 # Required Packages/Dependencies TTT
 
 library(pacman)
-p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula, ggplot2)
+p_load(raster, ncdf4, SoilR, abind, soilassessment, Formula, ggplot2)
 
 # install.packages("rtools")
 
@@ -41,7 +41,7 @@ Get_Delta_SOC_RothC = function(Years, Weather_File, Edaphic_File, ALMP_File_BL, 
       return(data.frame(Acc.TSMD, b, Max.TSMD))
     }
     
-    fW_2<- fw1func(P=(weather_file[,3]), E=(weather_file[,4]), S.Thick = edaphic_file$Soil_Depth, pClay = edaphic_file$ClayPerc_Stratum, pE = 1, bare=ALMP_file$Bare)$b
+    fW_2<- fw1func(P=(weather_file[,3] + ALMP_file[,5]), E=(weather_file[,4]), S.Thick = edaphic_file$Soil_Depth, pClay = edaphic_file$ClayPerc_Stratum, pE = 1, bare=ALMP_file$Bare)$b
     
     Cov2 = ALMP_file[,c("Month","Bare")] %>%
       mutate(Bare = ifelse(Bare == TRUE, 1,0.6))
@@ -119,7 +119,7 @@ calibrated_model_Input = data.frame("Soil_Carbon_Pool" = c("DPMptf", "RPMptf", "
 years_input = seq(1/12,1,by=1/12) 
 
 Delta_Test = Get_Delta_SOC_RothC(Years = years_input, 
-                                 Weather_File = JANSENVILLE_Weather_File, 
+                                 Weather_File = PE_Weather_File, 
                                  Edaphic_File = STRATUM_Edaphic_File, 
                                  ALMP_File_BL = ALMP_BL, 
                                  ALMP_File_PR = ALMP_PR, 
