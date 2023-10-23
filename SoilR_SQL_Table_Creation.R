@@ -38,7 +38,7 @@ keyring_lock("cng_SQL_Credentials")
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# INTERACTIVE PROMPTING
+#INTERACTIVE PROMPTING
 # connection <- odbc::dbConnect(odbc(),Driver = "ODBC Driver 18 for SQL Server",
 #                               Server = rstudioapi::showPrompt(title = "SQL Server", message = "Specify Server", default = ""),
 #                               Database = rstudioapi::showPrompt(title = "Database", message = "Specify Database", default = ""),
