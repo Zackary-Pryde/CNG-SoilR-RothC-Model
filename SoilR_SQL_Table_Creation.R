@@ -119,6 +119,7 @@ create_table_sql <- "
 # Execute the SQL statement to create the table
 dbExecute(connection, create_table_sql)
 
+dbDisconnect(connection)
 
 # OTHER
 # View the results
