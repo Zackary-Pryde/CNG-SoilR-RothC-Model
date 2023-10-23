@@ -48,3 +48,78 @@ keyring_lock("cng_SQL_Credentials")
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # 3. Create SQL tables for SoilR Input Data
+
+# 3.1 Weather File Input Table
+
+create_table_sql <- "
+  CREATE TABLE SoilR_Weather_File (
+    Month INT,
+    Temperature FLOAT,
+    Precipitation FLOAT,
+    Evapotranspiration FLOAT,
+    Weather_Station VARCHAR(MAX)
+  )
+"
+
+# Execute the SQL statement to create the table
+dbExecute(connection, create_table_sql)
+
+# 3.2 Stratum File Input Table
+
+create_table_sql <- "
+  CREATE TABLE SoilR_Stratum_File (
+    Stratum VARCHAR(MAX),
+    Clay_Percentage FLOAT,
+    SOC_Percentage FLOAT,
+    Bulk_Density FLOAT,
+    Soil_Depth FLOAT,
+    SOC_Stock FLOAT,
+    Calculated_IOM FLOAT
+  )
+"
+
+# Execute the SQL statement to create the table
+dbExecute(connection, create_table_sql)
+
+# 3.3 ALM File Input Table
+
+create_table_sql <- "
+  CREATE TABLE SoilR_ALM_File (
+    FarmID INT,
+    FieldID INT,
+    Scenario VARCHAR(MAX),
+    Month INT,
+    Bare VARCHAR(MAX),
+    Cinput FLOAT,
+    FYM FLOAT,
+    Irrigation FLOAT
+  )
+"
+
+# Execute the SQL statement to create the table
+dbExecute(connection, create_table_sql)
+
+# 3.4 Calibrated Model Input Table
+
+create_table_sql <- "
+  CREATE TABLE SoilR_Calibrated_Model (
+    Model_Name VARCHAR(MAX),
+    Stratum VARCHAR(MAX),
+    Weather_Station VARCHAR(MAX),
+    Cinput FLOAT,
+    DPM FLOAT,
+    RPM FLOAT,
+    BIO FLOAT,
+    HUM FLOAT,
+    IOM FLOAT,
+    SOC_Stock FLOAT
+  )
+"
+
+# Execute the SQL statement to create the table
+dbExecute(connection, create_table_sql)
+
+
+# OTHER
+# View the results
+# DB<-dbGetQuery(connection, "SELECT * FROM dbo.Master_Shapefile_Pre_Stratification")
