@@ -120,7 +120,3 @@ create_table_sql <- "
 dbExecute(connection, create_table_sql)
 
 dbDisconnect(connection)
-
-# OTHER
-# View the results
-# DB<-dbGetQuery(connection, "SELECT * FROM dbo.Master_Shapefile_Pre_Stratification")
