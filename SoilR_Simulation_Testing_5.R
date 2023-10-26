@@ -1,7 +1,7 @@
 # Required Packages/Dependencies TTT
 
 library(pacman)
-p_load(raster, ncdf4, SoilR, abind, soilassessment, Formula, ggplot2, tidyverse)
+p_load(raster, ncdf4, SoilR, abind, soilassessment, Formula, ggplot2, tidyverse, odbc, tidyverse, RODBC, DBI, dplyr, keyring)
 
 # Come up with Function Inputs that obtain the data from the SQL database ***
 
