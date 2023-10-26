@@ -103,3 +103,24 @@ DF = ALM_File
 DB <- dbGetQuery(connection, "SELECT * FROM dbo.SoilR_ALM_File")
 DB = rbind(DB, DF)
 dbWriteTable(connection, name = "SoilR_ALM_File", DB, overwrite = TRUE)
+
+# Farm Field Master to be inserted - - - - - - - - - - - - - -
+
+Farm_Field_Master = data.frame("Farmer_UID" = "Test",
+                               "FarmID" = 66,
+                               "Farm_UID" = "Test@Farm",
+                               "FieldID" = 14097,
+                               "Paddock_UID" = "TestF1",
+                               "Field_Size" = 25.5,
+                               "Stratum" = "Test",
+                               "Weather_Station" = "JANSENVILLE",
+                               "Calibrated_Model" = "Test - JANSENVILLE",
+                               "Action" = "RUN",
+                               "Project" = "TRACE AND SAVE PD1 MR2",
+                               "Start_Year" = 2020,
+                               "Comments" = "Storms River Field 1 Test Farm")
+
+DF = Farm_Field_Master
+DB <- dbGetQuery(connection, "SELECT * FROM dbo.SoilR_Farm_Field_Master")
+DB = rbind(DB, DF)
+dbWriteTable(connection, name = "SoilR_Farm_Field_Master", DB, overwrite = TRUE)

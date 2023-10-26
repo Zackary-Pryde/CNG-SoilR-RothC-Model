@@ -116,4 +116,31 @@ create_table_sql <- "
 # Execute the SQL statement to create the table
 dbExecute(connection, create_table_sql)
 
+# 3.5 Farm Field Master Table (Perhaps shapefile in future)
+
+create_table_sql <- "
+  CREATE TABLE SoilR_Farm_Field_Master (
+    Farmer_UID VARCHAR(MAX),
+    FarmID INT,
+    Farm_UID VARCHAR(MAX),
+    FieldID INT,
+    Paddock_UID VARCHAR(MAX),
+    Field_Size FLOAT,
+    Stratum VARCHAR(MAX),
+    Weather_Station VARCHAR(MAX),
+    Calibrated_Model VARCHAR(MAX),
+    Action VARCHAR(MAX),
+    Project VARCHAR(MAX),
+    Start_Year INT,
+    Comments VARCHAR(MAX)
+  )
+"
+
+# Execute the SQL statement to create the table
+dbExecute(connection, create_table_sql)
+
+
+# - - - - - - - - - - - - - - - - - - 
+# Disconnect from the SQL database
 dbDisconnect(connection)
+# - - - - - - - - - - - - - - - - - - 

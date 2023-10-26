@@ -123,57 +123,57 @@ TEST = Get_Delta_SOC_RothC(Weather_File = JANSENVILLE_Weather_File,
 
 RESULT = do.call(rbind,TEST)
 
-RESULT$Month = 1:24
-
-# Plotting the PR and BL SOC Stock Rates over time
-ggplot(data = RESULT, aes(x = Month)) + theme_minimal() + 
-  geom_line(aes(y = SOC_Stock_BL), color = "darkblue", linetype = "dashed", lwd = 0.75) + 
-  geom_line(aes(y = SOC_Stock_PR), color = "darkred", linetype = "dashed", lwd = 0.75) +
-  labs(x = "Month",
-       y = "SOC Stocks (t/Ha)",
-       title = "Storms River Over Two Project Years") + 
-  geom_vline(xintercept = c(1,13,24), linetype = "dashed", color = "darkgray") + 
-  theme(axis.title.x = element_text(vjust=-4), axis.title.y = element_text(vjust=4), plot.margin = unit(c(0.5,0.5,0.5,0.5), "cm"), panel.grid.minor = element_blank(), panel.grid.major = element_blank(), aspect.ratio = 4/5) +
-  annotate("text", x=1.5, y=105, label="t = 0") +
-  annotate("text", x=13.5, y=105, label="t = 1") +
-  annotate("text", x=24.5, y=105, label="t = 2")
-
-# Plotting the DELTA SOC Stock Rate over time
-RESULT$Delta_SOC = RESULT$SOC_Stock_PR - RESULT$SOC_Stock_BL
-
-ggplot(data = RESULT, aes(x = Month)) + theme_minimal() + 
-  geom_line(aes(y = Delta_SOC), color = "black", linetype = "dashed", lwd = 0.75) +
-  labs(x = "Month",
-       y = "Change in SOC Stocks (t/Ha)",
-       title = "Storms River Over Two Project Years") + 
-  geom_vline(xintercept = c(1,13,24), linetype = "dashed", color = "darkgray") + 
-  theme(axis.title.x = element_text(vjust=-3), axis.title.y = element_text(vjust=3), plot.margin = unit(c(0.5,0.5,0.5,0.5), "cm"), panel.grid.minor = element_blank(), panel.grid.major = element_blank(), aspect.ratio = 4/5) +
-  annotate("text", x=1.5, y=8, label="t = 0") + 
-  annotate("text", x=13.5, y=8, label="t = 1") + 
-  annotate("text", x=24.5, y=8, label="t = 2") 
-
-# Editing SOC stock Rate (BL and PR) time series plot
-
-SOC_BL_RESULT = RESULT[,1:6]
-names(SOC_BL_RESULT) = c("DPM","RPM","BIO","HUM","IOM","SOC_Stock")
-SOC_BL_RESULT$Scenario = "Baseline"
-SOC_BL_RESULT$Month = 1:24
-
-SOC_PR_RESULT = RESULT[,7:12]
-names(SOC_PR_RESULT) = c("DPM","RPM","BIO","HUM","IOM","SOC_Stock")
-SOC_PR_RESULT$Scenario = "Project"
-SOC_PR_RESULT$Month = 1:24
-
-RESULT_Edited = rbind(SOC_BL_RESULT,SOC_PR_RESULT)
-
-ggplot(data = RESULT_Edited, aes(x = Month, y = SOC_Stock, color = Scenario)) + 
-  theme_minimal() + 
-  geom_line(linetype = "dashed", lwd = 0.75) +
-  labs(x = "Month",
-       y = "SOC Stocks (t/Ha)",
-       title = "Storms River Over Two Project Years") + 
-  geom_vline(xintercept = c(1,13,24), linetype = "dashed", color = "darkgray") + 
-  theme(axis.title.x = element_text(vjust=-4), axis.title.y = element_text(vjust=4), plot.margin = unit(c(0.5,0.5,0.5,0.5), "cm"), panel.grid.minor = element_blank(), panel.grid.major = element_blank(), aspect.ratio = 4/5) +
-  annotate("text", x=1.5, y=105, label="t = 0") +
-  annotate("text", x=13.5, y=105, label="t = 1") +
-  annotate("text", x=24.5, y=105, label="t = 2")
+# RESULT$Month = 1:24
+# 
+# # Plotting the PR and BL SOC Stock Rates over time
+# ggplot(data = RESULT, aes(x = Month)) + theme_minimal() + 
+#   geom_line(aes(y = SOC_Stock_BL), color = "darkblue", linetype = "dashed", lwd = 0.75) + 
+#   geom_line(aes(y = SOC_Stock_PR), color = "darkred", linetype = "dashed", lwd = 0.75) +
+#   labs(x = "Month",
+#        y = "SOC Stocks (t/Ha)",
+#        title = "Storms River Over Two Project Years") + 
+#   geom_vline(xintercept = c(1,13,24), linetype = "dashed", color = "darkgray") + 
+#   theme(axis.title.x = element_text(vjust=-4), axis.title.y = element_text(vjust=4), plot.margin = unit(c(0.5,0.5,0.5,0.5), "cm"), panel.grid.minor = element_blank(), panel.grid.major = element_blank(), aspect.ratio = 4/5) +
+#   annotate("text", x=1.5, y=105, label="t = 0") +
+#   annotate("text", x=13.5, y=105, label="t = 1") +
+#   annotate("text", x=24.5, y=105, label="t = 2")
+# 
+# # Plotting the DELTA SOC Stock Rate over time
+# RESULT$Delta_SOC = RESULT$SOC_Stock_PR - RESULT$SOC_Stock_BL
+# 
+# ggplot(data = RESULT, aes(x = Month)) + theme_minimal() + 
+#   geom_line(aes(y = Delta_SOC), color = "black", linetype = "dashed", lwd = 0.75) +
+#   labs(x = "Month",
+#        y = "Change in SOC Stocks (t/Ha)",
+#        title = "Storms River Over Two Project Years") + 
+#   geom_vline(xintercept = c(1,13,24), linetype = "dashed", color = "darkgray") + 
+#   theme(axis.title.x = element_text(vjust=-3), axis.title.y = element_text(vjust=3), plot.margin = unit(c(0.5,0.5,0.5,0.5), "cm"), panel.grid.minor = element_blank(), panel.grid.major = element_blank(), aspect.ratio = 4/5) +
+#   annotate("text", x=1.5, y=8, label="t = 0") + 
+#   annotate("text", x=13.5, y=8, label="t = 1") + 
+#   annotate("text", x=24.5, y=8, label="t = 2") 
+# 
+# # Editing SOC stock Rate (BL and PR) time series plot
+# 
+# SOC_BL_RESULT = RESULT[,1:6]
+# names(SOC_BL_RESULT) = c("DPM","RPM","BIO","HUM","IOM","SOC_Stock")
+# SOC_BL_RESULT$Scenario = "Baseline"
+# SOC_BL_RESULT$Month = 1:24
+# 
+# SOC_PR_RESULT = RESULT[,7:12]
+# names(SOC_PR_RESULT) = c("DPM","RPM","BIO","HUM","IOM","SOC_Stock")
+# SOC_PR_RESULT$Scenario = "Project"
+# SOC_PR_RESULT$Month = 1:24
+# 
+# RESULT_Edited = rbind(SOC_BL_RESULT,SOC_PR_RESULT)
+# 
+# ggplot(data = RESULT_Edited, aes(x = Month, y = SOC_Stock, color = Scenario)) + 
+#   theme_minimal() + 
+#   geom_line(linetype = "dashed", lwd = 0.75) +
+#   labs(x = "Month",
+#        y = "SOC Stocks (t/Ha)",
+#        title = "Storms River Over Two Project Years") + 
+#   geom_vline(xintercept = c(1,13,24), linetype = "dashed", color = "darkgray") + 
+#   theme(axis.title.x = element_text(vjust=-4), axis.title.y = element_text(vjust=4), plot.margin = unit(c(0.5,0.5,0.5,0.5), "cm"), panel.grid.minor = element_blank(), panel.grid.major = element_blank(), aspect.ratio = 4/5) +
+#   annotate("text", x=1.5, y=105, label="t = 0") +
+#   annotate("text", x=13.5, y=105, label="t = 1") +
+#   annotate("text", x=24.5, y=105, label="t = 2")
