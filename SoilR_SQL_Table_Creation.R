@@ -84,8 +84,7 @@ dbExecute(connection, create_table_sql)
 
 create_table_sql <- "
   CREATE TABLE SoilR_ALM_File (
-    FarmID INT,
-    FieldID INT,
+    Paddock_UID VARCHAR(MAX),
     Scenario VARCHAR(MAX),
     Month INT,
     Bare VARCHAR(MAX),
@@ -121,9 +120,7 @@ dbExecute(connection, create_table_sql)
 create_table_sql <- "
   CREATE TABLE SoilR_Farm_Field_Master (
     Farmer_UID VARCHAR(MAX),
-    FarmID INT,
     Farm_UID VARCHAR(MAX),
-    FieldID INT,
     Paddock_UID VARCHAR(MAX),
     Field_Size FLOAT,
     Stratum VARCHAR(MAX),

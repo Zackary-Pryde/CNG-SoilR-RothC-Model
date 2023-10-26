@@ -71,8 +71,7 @@ dbWriteTable(connection, name = "SoilR_Calibrated_Model", DB, overwrite = TRUE)
 
 # ALM File to be inserted - - - - - - - - - - - - - -
 
-ALM_File = data.frame("FarmID" = rep(66,12),
-                      "FieldID" = rep(14097,12),
+ALM_File = data.frame("Paddock_UID" = rep("TestF1",12),
                       "Scenario" = "Baseline",
                       "Month" = 1:12,
                       "Bare" = c(FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
@@ -86,8 +85,7 @@ DB = rbind(DB, DF)
 dbWriteTable(connection, name = "SoilR_ALM_File", DB, overwrite = TRUE)
 
 # Project
-ALM_File = data.frame("FarmID" = rep(66,24),
-                      "FieldID" = rep(14097,24),
+ALM_File = data.frame("Paddock_UID" = rep("TestF1",24),
                       "Scenario" = "Project",
                       "Month" = 1:24,
                       "Bare" = c(FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
@@ -107,9 +105,7 @@ dbWriteTable(connection, name = "SoilR_ALM_File", DB, overwrite = TRUE)
 # Farm Field Master to be inserted - - - - - - - - - - - - - -
 
 Farm_Field_Master = data.frame("Farmer_UID" = "Test",
-                               "FarmID" = 66,
                                "Farm_UID" = "Test@Farm",
-                               "FieldID" = 14097,
                                "Paddock_UID" = "TestF1",
                                "Field_Size" = 25.5,
                                "Stratum" = "Test",
