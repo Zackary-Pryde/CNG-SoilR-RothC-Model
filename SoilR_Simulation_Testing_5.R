@@ -139,42 +139,10 @@ Get_Delta_SOC_RothC = function(Paddock_UID_Input) {
     
     SOC_MODEL_RESULT[[year_index]] = cbind(SOC_BL, SOC_PR)
   }
-  
-  return(SOC_MODEL_RESULT)
+  SOC_MODEL_RESULT_DF = do.call(rbind,SOC_MODEL_RESULT)
+  SOC_MODEL_RESULT_DF$Month = 1:nrow(SOC_MODEL_RESULT_DF)
+  return(SOC_MODEL_RESULT_DF)
 }
 
 TEST = Get_Delta_SOC_RothC(Paddock_UID_Input = "TestF1")
-
-RESULT = do.call(rbind,TEST)
-
-# Testing SQL Operations
-# 
-# 
-# # SQL Operations
-# keyring_unlock("cng_SQL_Credentials")
-# connection <- odbc::dbConnect(odbc(),Driver = "ODBC Driver 17 for SQL Server",
-#                               Server = key_get("SQL_Server", keyring ="cng_SQL_Credentials"),
-#                               Database = key_get("Database", keyring ="cng_SQL_Credentials"),
-#                               UID = key_get("Username", keyring ="cng_SQL_Credentials"),
-#                               PWD = key_get("Password", keyring ="cng_SQL_Credentials"))
-# keyring_lock("cng_SQL_Credentials")
-# 
-# Paddock_UID_Input = "TestF1"
-# 
-# FFM_Information <- dbGetQuery(connection, paste0("SELECT * FROM dbo.SoilR_Farm_Field_Master WHERE Paddock_UID = '", Paddock_UID_Input,"'"))
-# 
-# Weather_File = dbGetQuery(connection, paste0("SELECT * FROM dbo.SoilR_Weather_File WHERE Weather_Station = '", FFM_Information$Weather_Station,"'")) %>%
-#   dplyr::select(Month, "Temp" = Temperature, "Precip" = Precipitation, "Evp" = Evapotranspiration)
-# 
-# Edaphic_File = dbGetQuery(connection, paste0("SELECT * FROM dbo.SoilR_Stratum_File WHERE Stratum = '", FFM_Information$Stratum,"'")) %>%
-#   dplyr::select(Soil_Depth, "SOC_Stratum" = SOC_Stock, "ClayPerc_Stratum" = Clay_Percentage)
-# 
-# ALMP_File_BL = dbGetQuery(connection, paste0("SELECT * FROM dbo.SoilR_ALM_File WHERE Paddock_UID = '", FFM_Information$Paddock_UID,"'", "AND Scenario = 'Baseline'")) %>%
-#   dplyr::select(Month, Bare, Cinput, FYM, Irrigation)
-# 
-# ALMP_File_PR = dbGetQuery(connection, paste0("SELECT * FROM dbo.SoilR_ALM_File WHERE Paddock_UID = '", FFM_Information$Paddock_UID,"'", "AND Scenario = 'Project'")) %>%
-#   dplyr::select(Month, Bare, Cinput, FYM, Irrigation)
-# 
-# calibrated_model_Input = dbGetQuery(connection, paste0("SELECT * FROM dbo.SoilR_Calibrated_Model WHERE Model_Name = '", FFM_Information$Calibrated_Model,"'")) %>%
-#   dplyr::select(DPM,RPM,BIO,HUM,IOM)
-# 
+TEST
