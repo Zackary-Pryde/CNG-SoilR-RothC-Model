@@ -3,6 +3,7 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # 
 # This R script is the first attempt at RothC model SIMULATION using SoilR.
+
 # Use the existing RothC files to attempt to reach the same solution for Field 1  
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -12,13 +13,24 @@
 library(pacman)
 p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula)
 
+# The code below follows a brief tutorial set out at the following resource:
+# https://www.bgc-jena.mpg.de/TEE/basics/2015/11/19/RothC/
+# 
+# NB: Tutorial covers Method 1: "Using clay content, litter inputs, and climate data"
+# 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
 # 2. Clay content, litter inputs, and climate data ----
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
 # This script will use data inputs and outputs for the PD1 MR1 Farm: Storms River - Field 1.
+
+# NB I am setting up these data to track that used for the PD1 MR1 Farm: Storms River.
 #   Weather File = JANSENVILLE
 #   Stratum = Knysna-Amatole montane forests / Cfb : Temperate, no dry season, warm summer
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
 
 ### 2. Weather Data ----
 
@@ -33,7 +45,6 @@ Evp = data.frame("Month" = 1:12,
 
 # Evp = data.frame("Month" = 1:12, 
 #                  "Evp" = c(8.55, 7.97, 6.17, 4.76, 3.64, 2.98, 3.13, 4.06, 5.29, 6.46, 8.29, 8.87))
-
 
 ### 3. Edaphic Data ----
 
