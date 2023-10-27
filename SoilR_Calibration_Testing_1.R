@@ -93,5 +93,20 @@ RothC_Calibration_CNG = function(Weather_File,Edaphic_File) {
 
 # 4. Usage ----
 
-RothC_Calibration_CNG(Weather_File = JANSENVILLE_Weather_File,
-                      Edaphic_File = STRATUM_Edaphic_File)
+Test1 = RothC_Calibration_CNG(Weather_File = JANSENVILLE_Weather_File,
+                              Edaphic_File = STRATUM_Edaphic_File)
+
+
+Test2 = data.frame("DPM" = Test1[1],
+                   "RPM" = Test1[2],
+                   "BIO" = Test1[3],
+                   "HUM" = Test1[4],
+                   "IOM" = Test1[5])
+
+Test2_NEW = c(1,2,3,4,5)
+
+Test2 = rbind(Test2, Test2_NEW)
+
+Isdat = tail(Test2, 1)
+
+Isdat$
