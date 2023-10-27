@@ -120,3 +120,9 @@ DF = Farm_Field_Master
 DB <- dbGetQuery(connection, "SELECT * FROM dbo.SoilR_Farm_Field_Master")
 DB = rbind(DB, DF)
 dbWriteTable(connection, name = "SoilR_Farm_Field_Master", DB, overwrite = TRUE)
+
+
+# - - - - - - - - - - - - - - - - - - 
+# Disconnect from the SQL database
+dbDisconnect(connection)
+# - - - - - - - - - - - - - - - - - - 

@@ -148,6 +148,8 @@ Get_Delta_SOC_RothC = function(Paddock_UID_Input) {
   SOC_MODEL_RESULT_DF = SOC_MODEL_RESULT_DF[,c("Paddock_UID", "Month", "DPM_BL", "RPM_BL", "BIO_BL", "HUM_BL", "IOM_BL", "SOC_Stock_BL", "DPM_PR", "RPM_PR", "BIO_PR", "HUM_PR", "IOM_PR", "SOC_Stock_PR", "Delta_SOC_Stock")]
   
   
+  
+  dbDisconnect(connection)
   return(SOC_MODEL_RESULT_DF)
 }
 

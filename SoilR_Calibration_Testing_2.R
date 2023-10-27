@@ -121,6 +121,7 @@ RothC_Calibration_CNG = function(Model_Name_Input) {
   
   dbWriteTable(connection, name = "SoilR_Calibrated_Model", DB, overwrite = TRUE)
   
+  dbDisconnect(connection)
   return(Calibrated_Model)
 }
 

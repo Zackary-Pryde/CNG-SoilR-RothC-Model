@@ -97,25 +97,7 @@ create_table_sql <- "
 # Execute the SQL statement to create the table
 dbExecute(connection, create_table_sql)
 
-# 3.4 Calibrated Model Input Table
-
-create_table_sql <- "
-  CREATE TABLE SoilR_Calibrated_Model (
-    Model_Name VARCHAR(MAX),
-    Stratum VARCHAR(MAX),
-    Weather_Station VARCHAR(MAX),
-    DPM FLOAT,
-    RPM FLOAT,
-    BIO FLOAT,
-    HUM FLOAT,
-    IOM FLOAT
-  )
-"
-
-# Execute the SQL statement to create the table
-dbExecute(connection, create_table_sql)
-
-# 3.5 Farm Field Master Table (Perhaps shapefile in future)
+# 3.4 Farm Field Master Table (Perhaps shapefile in future)
 
 create_table_sql <- "
   CREATE TABLE SoilR_Farm_Field_Master (
@@ -135,6 +117,69 @@ create_table_sql <- "
 
 # Execute the SQL statement to create the table
 dbExecute(connection, create_table_sql)
+
+# 4. Create SQL tables for SoilR Output Data
+
+# 4.1 Calibrated Model Output Table 
+
+create_table_sql <- "
+  CREATE TABLE SoilR_Calibrated_Model (
+    Model_Name VARCHAR(MAX),
+    Stratum VARCHAR(MAX),
+    Weather_Station VARCHAR(MAX),
+    DPM FLOAT,
+    RPM FLOAT,
+    BIO FLOAT,
+    HUM FLOAT,
+    IOM FLOAT
+  )
+"
+
+# Execute the SQL statement to create the table
+dbExecute(connection, create_table_sql)
+
+# 4.2 Simulation Raw Result Output Table 
+
+create_table_sql <- "
+  CREATE TABLE SoilR_Simulation_Raw_Output (
+    Paddock_UID VARCHAR(MAX),
+    Month INT,
+    DPM_BL FLOAT,
+    RPM_BL FLOAT,
+    BIO_BL FLOAT,
+    HUM_BL FLOAT,
+    IOM_BL FLOAT,
+    SOC_Stock_BL FLOAT,
+    DPM_PR FLOAT,
+    RPM_PR FLOAT,
+    BIO_PR FLOAT,
+    HUM_PR FLOAT,
+    IOM_PR FLOAT,
+    SOC_Stock_PR FLOAT,
+    Delta_SOC_Stock FLOAT
+  )
+"
+
+# Execute the SQL statement to create the table
+dbExecute(connection, create_table_sql)
+
+# 4.3 Simulation Formatted Result Output Table 
+
+create_table_sql <- "
+  CREATE TABLE SoilR_Simulation_Summary_Output (
+    Paddock_UID VARCHAR(MAX),
+    Year INT,
+    Field_Size FLOAT,
+    SOC_Stock_BL FLOAT,
+    SOC_Stock_PR FLOAT,
+    Delta_SOC_Stock FLOAT,
+    Emissions_Output FLOAT
+  )
+"
+
+# Execute the SQL statement to create the table
+dbExecute(connection, create_table_sql)
+
 
 
 # - - - - - - - - - - - - - - - - - - 

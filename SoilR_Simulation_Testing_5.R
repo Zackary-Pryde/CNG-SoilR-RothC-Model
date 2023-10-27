@@ -141,6 +141,8 @@ Get_Delta_SOC_RothC = function(Paddock_UID_Input) {
   }
   SOC_MODEL_RESULT_DF = do.call(rbind,SOC_MODEL_RESULT)
   SOC_MODEL_RESULT_DF$Month = 1:nrow(SOC_MODEL_RESULT_DF)
+  
+  dbDisconnect(connection)
   return(SOC_MODEL_RESULT_DF)
 }
 
