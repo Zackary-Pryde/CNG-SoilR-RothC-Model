@@ -85,16 +85,20 @@ DB = rbind(DB, DF)
 dbWriteTable(connection, name = "SoilR_ALM_File", DB, overwrite = TRUE)
 
 # Project
-ALM_File = data.frame("Paddock_UID" = rep("TestF1",24),
+ALM_File = data.frame("Paddock_UID" = rep("TestF1",36),
                       "Scenario" = "Project",
-                      "Month" = 1:24,
+                      "Month" = 1:36,
                       "Bare" = c(FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+                                 FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
                                  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
                       "Cinput" = c(rep(1.56466235908391, 12), 
+                                   rep(1.96466235908391, 12), 
                                    rep(1.96466235908391, 12)),
                       "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0,
-                                0,0.5,0.5,0.5,0.5,0.5,0,0,0,0,0,0),
+                                0,0.5,0.5,0.5,0.5,0.5,0,0,0,0,0,0,
+                                0,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0,0),
                       "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0,
+                                       0,0,0,0,0,0,0,0,0,0,0,0,
                                        0,0,0,0,0,0,0,0,0,0,0,0))
 
 DF = ALM_File

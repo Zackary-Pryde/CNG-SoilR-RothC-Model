@@ -146,13 +146,53 @@ Get_Delta_SOC_RothC = function(Paddock_UID_Input) {
   SOC_MODEL_RESULT_DF$Paddock_UID = FFM_Information$Paddock_UID
   
   SOC_MODEL_RESULT_DF = SOC_MODEL_RESULT_DF[,c("Paddock_UID", "Month", "DPM_BL", "RPM_BL", "BIO_BL", "HUM_BL", "IOM_BL", "SOC_Stock_BL", "DPM_PR", "RPM_PR", "BIO_PR", "HUM_PR", "IOM_PR", "SOC_Stock_PR", "Delta_SOC_Stock")]
+  rownames(SOC_MODEL_RESULT_DF) = NULL
   
+  DF = SOC_MODEL_RESULT_DF
+  DB <- dbGetQuery(connection, "SELECT * FROM dbo.SoilR_Simulation_Raw_Output")
   
+  if (any(DB$Paddock_UID == levels(as.factor(DF$Paddock_UID)))) {
+    DB = DB[-which(DB$Paddock_UID == levels(as.factor(DF$Paddock_UID))),]
+    DB = rbind(DB, DF)
+    rownames(DB) = NULL
+  } else {
+    DB = rbind(DB, DF)
+    rownames(DB) = NULL
+  }
   
-  dbDisconnect(connection)
+  dbWriteTable(connection, name = "SoilR_Simulation_Raw_Output", DB, overwrite = TRUE)
+  
+  Years_to_Report = seq(12,nrow(DF),12)
+  DF = DF[Years_to_Report,c("Paddock_UID","SOC_Stock_BL","SOC_Stock_PR","Delta_SOC_Stock")]
+  DF$Year = 1:nrow(DF)
+  
+  DF <- DF %>%
+    mutate(Delta_SOC_Stock_Claimable = ifelse(Year == 1, Delta_SOC_Stock, Delta_SOC_Stock - lag(Delta_SOC_Stock)))
+  
+  DF$Field_Size = FFM_Information$Field_Size # NB Need to change code to account for year-specific field size
+  DF$Emissions_Output = DF$Delta_SOC_Stock_Claimable * DF$Field_Size
+  
+  DF = DF[,c("Paddock_UID", "Year", "Field_Size", "SOC_Stock_BL", "SOC_Stock_PR","Delta_SOC_Stock", "Delta_SOC_Stock_Claimable", "Emissions_Output")]
+  
+  DB <- dbGetQuery(connection, "SELECT * FROM dbo.SoilR_Simulation_Summary_Output")
+  
+  if (any(DB$Paddock_UID == levels(as.factor(DF$Paddock_UID)))) {
+    DB = DB[-which(DB$Paddock_UID == levels(as.factor(DF$Paddock_UID))),]
+    DB = rbind(DB, DF)
+    rownames(DB) = NULL
+  } else {
+    DB = rbind(DB, DF)
+    rownames(DB) = NULL
+  }
+  
+  dbWriteTable(connection, name = "SoilR_Simulation_Summary_Output", DB, overwrite = TRUE)
+  
+  #dbDisconnect(connection)
+  
   return(SOC_MODEL_RESULT_DF)
 }
 
 TEST = Get_Delta_SOC_RothC(Paddock_UID_Input = "TestF1")
 TEST
+
 

@@ -113,8 +113,8 @@ RothC_Calibration_CNG = function(Model_Name_Input) {
   DF = Calibrated_Model
   DB <- dbGetQuery(connection, "SELECT * FROM dbo.SoilR_Calibrated_Model")
   
-  if (any(DB$Model_Name == Calibrated_Model$Model_Name)) {
-    DB[which(DB$Model_Name == Calibrated_Model$Model_Name),] = Calibrated_Model[1,]
+  if (any(DB$Model_Name == DF$Model_Name)) {
+    DB[which(DB$Model_Name == DF$Model_Name),] = DF[1,]
   } else {
     DB = rbind(DB, DF)
   }

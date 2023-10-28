@@ -173,6 +173,7 @@ create_table_sql <- "
     SOC_Stock_BL FLOAT,
     SOC_Stock_PR FLOAT,
     Delta_SOC_Stock FLOAT,
+    Delta_SOC_Stock_Claimable FLOAT,
     Emissions_Output FLOAT
   )
 "
