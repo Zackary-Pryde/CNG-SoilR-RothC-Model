@@ -194,5 +194,3 @@ Get_Delta_SOC_RothC = function(Paddock_UID_Input) {
 
 TEST = Get_Delta_SOC_RothC(Paddock_UID_Input = "TestF1")
 TEST
-
-
