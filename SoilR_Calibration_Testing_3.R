@@ -123,9 +123,9 @@ RothC_Calibration_CNG_Many_Models = function(Models_To_Calibrate) {
     }
     
     dbWriteTable(connection, name = "SoilR_Calibrated_Model", DB, overwrite = TRUE)
-    dbDisconnect(connection)
     print(paste0("Calibration Complete: ", Model_i))
   }
+  dbDisconnect(connection)
 }
 
 # 4. Usage ----
@@ -143,4 +143,4 @@ Models = c("Lowland fynbos and renosterveld / Cfb : Temperate, no dry season, wa
            "Drakensberg montane grasslands, woodlands and forests / Cfb : Temperate, no dry season, warm summer - QUEENSTOWN",
            "Nama Karoo / BSk : Arid, steppe, cold - PORT-ELIZABETH")
 
-Testing = RothC_Calibration_CNG(Model_Name_Input = "Test - JANSENVILLE")
+Testing = RothC_Calibration_CNG_Many_Models(Models_To_Calibrate = Models)
