@@ -187,7 +187,7 @@ Get_Delta_SOC_RothC = function(Paddock_UID_Input) {
   
   dbWriteTable(connection, name = "SoilR_Simulation_Summary_Output", DB, overwrite = TRUE)
   
-  #dbDisconnect(connection)
+  dbDisconnect(connection)
   
   return(SOC_MODEL_RESULT_DF)
 }
