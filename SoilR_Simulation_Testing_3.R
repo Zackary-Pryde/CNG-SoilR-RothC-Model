@@ -11,7 +11,7 @@
 # 1. Required Packages/Dependencies ----
 
 library(pacman)
-p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula, tidyverse)
+p_load(raster, ncdf4, SoilR, abind, soilassessment, Formula, tidyverse)
 
 # GSOC METHOD ----
 
@@ -19,6 +19,8 @@ p_load(raster, rgdal, ncdf4, SoilR, abind, soilassessment, Formula, tidyverse)
 # NB I am setting up these data to track that used for the PD1 MR1 Farm: Storms River.
 #   Weather File = JANSENVILLE
 #   Stratum = Knysna-Amatole montane forests / Cfb : Temperate, no dry season, warm summer
+# 
+# Last used on 1/11/23 For testing of Storms River Simulation against Russels Results in CDB
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 # GET DELTA SOC VIA ROTH C (Function)
@@ -56,7 +58,7 @@ Get_Delta_SOC_RothC = function(Years, Weather_File, Edaphic_File, ALMP_File_BL, 
       return(data.frame(Acc.TSMD, b, Max.TSMD))
     }
     
-    fW_2<- fw1func(P=(weather_file[,3]), E=(weather_file[,4]), S.Thick = edaphic_file$Soil_Depth, pClay = edaphic_file$ClayPerc_Stratum, pE = 1, bare=ALMP_file$Bare)$b
+    fW_2<- fw1func(P=(weather_file[,3] + ALMP_file[,4]), E=(weather_file[,4]), S.Thick = edaphic_file$Soil_Depth, pClay = edaphic_file$ClayPerc_Stratum, pE = 1, bare=ALMP_file$Bare)$b
     
     Cov2 = ALMP_file[,c("Month","Bare")] %>%
       mutate(Bare = ifelse(Bare == TRUE, 1,0.6))
@@ -74,7 +76,7 @@ Get_Delta_SOC_RothC = function(Years, Weather_File, Edaphic_File, ALMP_File_BL, 
                                     calibrated_model[4,2], 
                                     calibrated_model[5,2]),
                              ks = c(k.DPM = 10, k.RPM = 0.3, k.BIO = 0.66, k.HUM = 0.02, k.IOM = 0),
-                             In = ALMP_file$Cinput[1],
+                             In = ALMP_file$Cinput[1]*12,
                              FYM = ALMP_file$FYM[1],
                              DR = 1.44,
                              clay = edaphic_file$ClayPerc_Stratum,
@@ -102,6 +104,10 @@ Get_Delta_SOC_RothC = function(Years, Weather_File, Edaphic_File, ALMP_File_BL, 
   cat("\n","DELTA", "\n","\n")
   Delta_SOC = sum(SOC_PR) - sum(SOC_BL)
   print(Delta_SOC)
+  
+  print(sum(SOC_BL))
+  print(sum(SOC_PR))
+  
   return(Delta_SOC)
 }
 
@@ -110,21 +116,33 @@ Get_Delta_SOC_RothC = function(Years, Weather_File, Edaphic_File, ALMP_File_BL, 
 JANSENVILLE_Weather_File = data.frame("Month" = 1:12,
                                       "Temp" = c(24.75, 24.75, 22.8, 19.7, 15.55, 12.75, 12.2, 14.45, 16.95, 19.15, 21.35, 23.3),
                                       "Precip" = c(25.83, 27.65, 44.31, 27.65, 11.77, 7.9, 13.69, 16.54, 13.69, 21.23, 29.46, 25.83),
-                                      "Evp" = c(8.55, 7.97, 6.17, 4.76, 3.64, 2.98, 3.13, 4.06, 5.29, 6.46, 8.29, 8.87))
+                                      "Evp" = c(3.62,3.452,3.0165,1.854,1.615,1.551,1.555,1.852,2.348,2.4405,3.244,3.3335))
 
 STRATUM_Edaphic_File = data.frame("Soil_Depth" = 30,
                                   "SOC_Stratum" = 97.4651,
                                   "ClayPerc_Stratum" = 21.4800)
 
+# ALMP_BL = data.frame("Month" = 1:12,
+#                      "Bare" = c(TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
+#                      "Cinput" = rep(1.18131300047788, 12),
+#                      "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0),
+#                      "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
+# 
+# ALMP_PR = data.frame("Month" = 1:12,
+#                      "Bare" = c(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
+#                      "Cinput" = rep(1.56466235908391, 12),
+#                      "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0),
+#                      "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
+
 ALMP_BL = data.frame("Month" = 1:12,
-                     "Bare" = c(FALSE,FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
-                     "Cinput" = rep(1.18131300047788, 12),
+                     "Bare" = c(TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
+                     "Cinput" = rep(1.181313, 12),
                      "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0),
                      "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
 
 ALMP_PR = data.frame("Month" = 1:12,
                      "Bare" = c(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE),
-                     "Cinput" = rep(1.56466235908391, 12),
+                     "Cinput" = rep(1.564662359, 12),
                      "FYM" = c(0,0,0,0,0,0,0,0,0,0,0,0),
                      "Irrigation" = c(0,0,0,0,0,0,0,0,0,0,0,0))
 
