@@ -1,3 +1,18 @@
+# 0. File Information ----
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# 
+# DESCRIPTION:
+#   This R script is the seventh attempt at RothC model Simulation using SoilR.
+# 
+# GOAL OF THE EXERCISE:
+#   Simulation of RothC model for a set of fields/paddocks specified by their UID's.
+#   Results get written back to two SQL tables. One for raw output and another for 
+#   year-level summary results. 
+# 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+
 library(pacman)
 p_load(raster, ncdf4, SoilR, abind, soilassessment, Formula, ggplot2, tidyverse, odbc, tidyverse, RODBC, DBI, dplyr, keyring)
 
