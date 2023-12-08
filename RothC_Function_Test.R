@@ -16,11 +16,13 @@ options(digits = 8)
 # Input Data ----
 
 # SQL Credentials ----
+keyring_unlock("cng_SQL_Credentials")
 connection <- odbc::dbConnect(odbc(),Driver = "ODBC Driver 17 for SQL Server",
-                              Server = "sql-agricarbon-dev.database.windows.net",
-                              Database = "sqldb-agricarbon-dev",
-                              UID = "agricarbon_admin",
-                              PWD = "Cl1mat3_N3utral@2022")
+                              Server = key_get("SQL_Server", keyring ="cng_SQL_Credentials"),
+                              Database = key_get("Database", keyring ="cng_SQL_Credentials"),
+                              UID = key_get("Username", keyring ="cng_SQL_Credentials"),
+                              PWD = key_get("Password", keyring ="cng_SQL_Credentials"))
+keyring_lock("cng_SQL_Credentials")
 
 # Data acquisition and preparation ----
 
